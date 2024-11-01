@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="menu_background_tint_light_version">#3772E7</color>
     <color name="settings_icon_color_light_mode">#AEAFB4</color>
+    <color name="track_tint">#E6E8EB</color>
+    <color name="thumb_tint">#AEAFB4</color>
 </resources>
