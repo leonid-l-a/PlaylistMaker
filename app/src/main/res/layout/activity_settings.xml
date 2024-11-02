@@ -18,11 +18,18 @@
         app:titleTextColor="@color/black" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/settings_screen_text_style"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:layout_marginTop="24dp"
         android:text="@string/dark_mode"
         app:thumbTint="@color/thumb_tint"
-        app:trackTint="@color/track_tint" />
+        app:trackTint="@color/track_tint"
+        android:textAllCaps="false"
+        android:paddingHorizontal="@dimen/medium_padding"
+        android:paddingVertical="@dimen/medium_padding"
+        android:textSize="@dimen/text_common_size"
+        android:backgroundTint="@color/white"
+        app:switchMinWidth="35dp" />
 
     <TextView
         style="@style/settings_screen_text_style"
