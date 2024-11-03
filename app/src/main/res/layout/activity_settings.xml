@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        app:navigationIcon="@drawable/arrow_back"
+        android:onClick="backButton"
+        app:title="@string/settings"
+        app:titleTextColor="@color/black" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_dark_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:paddingHorizontal="@dimen/medium_padding"
+        android:paddingVertical="@dimen/medium_padding"
+        android:text="@string/dark_mode"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_common_size"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color"
+        app:switchMinWidth="35dp" />
+
+    <TextView
+        style="@style/settings_screen_text_style"
+        android:text="@string/share"
+        app:drawableRightCompat="@drawable/ic_share" />
+
+    <TextView
+        style="@style/settings_screen_text_style"
+        android:text="@string/support"
+        app:drawableRightCompat="@drawable/ic_support" />
+
+    <TextView
+        style="@style/settings_screen_text_style"
+        android:text="@string/user_agreement"
+        app:drawableRightCompat="@drawable/ic_user_agreement" />
+
+</LinearLayout>

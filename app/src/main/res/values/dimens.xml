@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="header_size">22sp</dimen>
+    <dimen name="medium_padding">16dp</dimen>
+    <dimen name="main_menu_button_radius">16dp</dimen>
+    <dimen name="small_padding">14dp</dimen>
+    <dimen name="text_common_size">16sp</dimen>
+    <dimen name="big_padding">21dp</dimen>
+</resources>
