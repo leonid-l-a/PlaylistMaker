@@ -18,17 +18,17 @@
         app:titleTextColor="@color/black" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:layout_height="wrap_content"
+        android:id="@+id/switch_dark_mode"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="@string/dark_mode"
-        app:thumbTint="@color/thumb_tint"
-        app:trackTint="@color/track_tint"
-        android:textAllCaps="false"
         android:paddingHorizontal="@dimen/medium_padding"
         android:paddingVertical="@dimen/medium_padding"
+        android:text="@string/dark_mode"
+        android:textAllCaps="false"
         android:textSize="@dimen/text_common_size"
-        android:backgroundTint="@color/white"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color"
         app:switchMinWidth="35dp" />
 
     <TextView
