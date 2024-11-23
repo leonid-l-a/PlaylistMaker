@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -9,6 +10,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
 
@@ -35,6 +37,8 @@ class SearchActivity : AppCompatActivity() {
 
         clearIcon.setOnClickListener {
             inputEditText.setText("")
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
         }
 
         val simpleTextWatcher = object : TextWatcher {
@@ -70,12 +74,12 @@ class SearchActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         val currentText = inputEditText.text.toString()
-        outState.putString(SEARCH_TEXT_KEY, currentText) // Сохранение текста
+        outState.putString(SEARCH_TEXT_KEY, currentText)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val restoredText = savedInstanceState.getString(SEARCH_TEXT_KEY) // Восстановление текста
+        val restoredText = savedInstanceState.getString(SEARCH_TEXT_KEY)
         inputEditText.setText(restoredText)
     }
 }
