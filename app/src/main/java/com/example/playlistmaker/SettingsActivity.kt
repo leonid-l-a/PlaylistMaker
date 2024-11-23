@@ -38,22 +38,6 @@ class SettingsActivity : AppCompatActivity() {
         userAgreementButton.setOnClickListener {
             openUserAgreement()
         }
-
-        darkModeSwitch = findViewById(R.id.switch_dark_mode)
-
-        sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE)
-
-        val isDarkModeEnabled = sharedPreferences.getBoolean("dark_mode", false)
-        darkModeSwitch.isChecked = isDarkModeEnabled
-
-        setAppTheme(isDarkModeEnabled)
-
-        darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            sharedPreferences.edit().putBoolean("dark_mode", isChecked).apply()
-
-            setAppTheme(isChecked)
-        }
-
     }
 
     private fun shareApp() {
