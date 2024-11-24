@@ -6,14 +6,8 @@ import com.google.android.material.appbar.MaterialToolbar
 import androidx.appcompat.app.AppCompatActivity
 import android.net.Uri
 import android.widget.TextView
-import androidx.appcompat.widget.SwitchCompat
-import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatDelegate
 
 class SettingsActivity : AppCompatActivity() {
-
-    private lateinit var darkModeSwitch: SwitchCompat
-    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +42,7 @@ class SettingsActivity : AppCompatActivity() {
                 getString(R.string.share_text)
             )
         }
-        startActivity(Intent.createChooser(shareIntent, "Поделиться приложением"))
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
     }
 
     private fun sendSupportEmail() {
@@ -64,7 +58,7 @@ class SettingsActivity : AppCompatActivity() {
                 getString(R.string.support_text)
             )
         }
-        startActivity(Intent.createChooser(emailIntent, "Написать в поддержку"))
+        startActivity(Intent.createChooser(emailIntent, getString(R.string.text_to_support)))
     }
 
     private fun openUserAgreement() {
@@ -73,11 +67,5 @@ class SettingsActivity : AppCompatActivity() {
         startActivity(browserIntent)
     }
 
-    private fun setAppTheme(isDarkModeEnabled: Boolean) {
-        if (isDarkModeEnabled) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
-    }
+
 }

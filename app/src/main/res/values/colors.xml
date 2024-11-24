@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="common_screen_background_tint">#FFFFFFFF</color>
     <color name="common_text_color">#1A1B22</color>
+    <color name="settings_activity_icon_fill_color">#AEAFB4</color>
     <color name="main_activity_background_tint">#3772E7</color>
+    <color name="main_activity_button_text_color">#1A1B22</color>
     <color name="switch_track_inactive_color">#E6E8EB</color>
     <color name="switch_track_active_color">#9FBBF3</color>
     <color name="switch_thumb_inactive_color">#AEAFB4</color>
     <color name="switch_thumb_active_color">#3772E7</color>
-    <color name="settings_activity_background_tint">#FFFFFFFF</color>
-    <color name="settings_activity_text_color">#FF000000</color>
-    <color name="settings_activity_icon_fill_color">#AEAFB4</color>
     <color name="search_line_color">#E6E8EB</color>
     <color name="search_line_hint_color">#AEAFB4</color>
+    <color name="search_input_text_color">#1A1B22</color>
 </resources>

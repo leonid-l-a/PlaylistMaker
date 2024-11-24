@@ -1,7 +1,6 @@
 package com.example.playlistmaker
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,6 +20,7 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         private const val SEARCH_TEXT_KEY = "SEARCH_TEXT_KEY"
+        var searchQuery: String = ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,11 +29,14 @@ class SearchActivity : AppCompatActivity() {
 
         val backButton: MaterialToolbar = findViewById(R.id.toolbar)
         backButton.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
 
         inputEditText = findViewById(R.id.searchEditText)
         clearIcon = findViewById(R.id.clearIcon)
+
+        // Восстановление текста из глобальной переменной
+        inputEditText.setText(searchQuery)
 
         clearIcon.setOnClickListener {
             inputEditText.setText("")
@@ -49,6 +52,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
+                searchQuery = s.toString()
                 clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
             }
         }
@@ -75,11 +79,13 @@ class SearchActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         val currentText = inputEditText.text.toString()
         outState.putString(SEARCH_TEXT_KEY, currentText)
+        searchQuery = currentText
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         val restoredText = savedInstanceState.getString(SEARCH_TEXT_KEY)
         inputEditText.setText(restoredText)
+        searchQuery = restoredText ?: ""
     }
 }
