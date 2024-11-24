@@ -49,7 +49,7 @@
             android:layout_margin="10dp"
             android:contentDescription="@string/clear"
             android:src="@drawable/ic_button_clear"
-            android:tint="@color/search_line_hint_color"
+            app:tint="@color/search_line_hint_color"
             android:visibility="gone"/>
 
     </LinearLayout>
