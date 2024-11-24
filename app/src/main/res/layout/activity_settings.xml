@@ -1,49 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
-    android:background="@color/white"
+    android:background="@color/common_screen_background_tint"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/backButton"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        app:navigationIcon="@drawable/arrow_back"
-        android:onClick="backButton"
-        app:title="@string/settings"
-        app:titleTextColor="@color/black" />
+        style="@style/toolbar_style"
+        app:title="@string/settings" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch_dark_mode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/settings_screen_text_view_style"
         android:layout_marginTop="24dp"
-        android:paddingHorizontal="@dimen/medium_padding"
-        android:paddingVertical="@dimen/medium_padding"
         android:text="@string/dark_mode"
-        android:textAllCaps="false"
-        android:textSize="@dimen/text_common_size"
+        app:switchMinWidth="35dp"
         app:thumbTint="@color/switch_thumb_color"
-        app:trackTint="@color/switch_track_color"
-        app:switchMinWidth="35dp" />
+        app:trackTint="@color/switch_track_color" />
 
     <TextView
-        style="@style/settings_screen_text_style"
+        android:id="@+id/share_button"
+        style="@style/settings_screen_text_view_style"
         android:text="@string/share"
         app:drawableRightCompat="@drawable/ic_share" />
 
     <TextView
-        style="@style/settings_screen_text_style"
+        android:id="@+id/support_button"
+        style="@style/settings_screen_text_view_style"
         android:text="@string/support"
         app:drawableRightCompat="@drawable/ic_support" />
 
     <TextView
-        style="@style/settings_screen_text_style"
+        android:id="@+id/user_agreement"
+        style="@style/settings_screen_text_view_style"
         android:text="@string/user_agreement"
         app:drawableRightCompat="@drawable/ic_user_agreement" />
-
 </LinearLayout>

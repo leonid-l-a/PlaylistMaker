@@ -1,26 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="settings_screen_text_style">
+    <style name="settings_screen_text_view_style">
         <item name="android:textSize">@dimen/text_common_size</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:paddingHorizontal">@dimen/medium_padding</item>
-        <item name="android:paddingVertical">@dimen/medium_padding</item>
-        <item name="android:drawablePadding">16dp</item>
+        <item name="android:textColor">@color/common_text_color</item>
+        <item name="android:paddingStart">@dimen/medium_padding</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingVertical">@dimen/big_padding</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">61dp</item>
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="fontWeight">400</item>
+        <item name="android:drawableTint">@color/settings_activity_icon_fill_color</item>
     </style>
 
-    <style name="main_screen_button_style">
+    <style name="main_screen_button_style" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="backgroundTint">@color/white</item>
         <item name="android:textSize">@dimen/header_size</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/main_activity_button_text_color</item>
         <item name="cornerRadius">@dimen/main_menu_button_radius</item>
         <item name="iconGravity">textStart</item>
-        <item name="iconTint">@color/black</item>
+        <item name="iconTint">@color/main_activity_button_text_color</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="fontWeight">500</item>
+    </style>
 
+    <style name="toolbar_style" parent="header_style">
+        <item name="navigationIcon">@drawable/ic_arrow_back</item>
+        <item name="navigationIconTint">@color/common_text_color</item>
+    </style>
+
+    <style name="header_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="titleTextColor">@color/common_text_color</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textFontWeight">500</item>
     </style>
 </resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="common_screen_background_tint">#1A1B22</color>
+    <color name="common_text_color">#FFFFFFFF</color>
+    <color name="settings_activity_icon_fill_color">#FFFFFFFF</color>
+    <color name="main_activity_background_tint">#1A1B22</color>
+    <color name="search_line_color">#FFFFFF</color>
+    <color name="search_line_hint_color">#1A1B22</color>
+</resources>
