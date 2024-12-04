@@ -37,5 +37,5 @@
         android:id="@+id/user_agreement"
         style="@style/settings_screen_text_view_style"
         android:text="@string/user_agreement"
-        app:drawableRightCompat="@drawable/ic_user_agreement" />
+        app:drawableRightCompat="@drawable/ic_arrow_forward" />
 </LinearLayout>

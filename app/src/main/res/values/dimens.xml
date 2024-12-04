@@ -6,4 +6,6 @@
     <dimen name="small_padding">14dp</dimen>
     <dimen name="text_common_size">16sp</dimen>
     <dimen name="big_padding">21dp</dimen>
+    <dimen name="big_line_height">61dp</dimen>
+    <dimen name="common_line_height">56dp</dimen>
 </resources>

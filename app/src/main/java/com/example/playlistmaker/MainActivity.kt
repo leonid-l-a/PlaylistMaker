@@ -15,12 +15,12 @@ class MainActivity : AppCompatActivity() {
         val button2: Button = findViewById(R.id.button2)
         val button3: Button = findViewById(R.id.button3)
 
-        button2.setOnClickListener {
-            startActivity(Intent(this, LibraryActivity::class.java))
-        }
-
         button1.setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
+        }
+
+        button2.setOnClickListener {
+            startActivity(Intent(this, LibraryActivity::class.java))
         }
 
         button3.setOnClickListener {
