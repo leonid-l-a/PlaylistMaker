@@ -54,6 +54,15 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/placeholderView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="102dp"
+        android:src="@drawable/ic_placeholder"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -61,4 +70,3 @@
         android:layout_marginTop="@dimen/medium_padding"
         android:backgroundTint="@color/common_screen_background_tint"/>
 </LinearLayout>
-
