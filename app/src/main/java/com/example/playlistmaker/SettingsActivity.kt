@@ -15,7 +15,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val backButton: MaterialToolbar = findViewById(R.id.backButton)
         backButton.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
 
         val shareButton: TextView = findViewById(R.id.share_button)
@@ -66,6 +66,4 @@ class SettingsActivity : AppCompatActivity() {
             Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.user_agreement_uri)))
         startActivity(browserIntent)
     }
-
-
 }

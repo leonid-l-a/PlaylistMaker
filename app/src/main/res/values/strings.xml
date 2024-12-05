@@ -15,4 +15,7 @@
     <string name="user_agreement_uri">https://yandex.ru/legal/practicum_offer/</string>
     <string name="share_app">Поделиться приложением</string>
     <string name="text_to_support">Написать в поддержку</string>
+    <string name="track_name">Smells Like Teen Spirit</string>
+    <string name="the_beatles">Nirvana</string>
+    <string name="track_time">5:01</string>
 </resources>
