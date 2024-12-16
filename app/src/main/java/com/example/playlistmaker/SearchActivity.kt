@@ -14,14 +14,10 @@ import com.example.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private val itunesBaseUrl = "https://itunes.apple.com"
-    private lateinit var itunesService: ItunesService
 
     companion object {
         var searchQuery: String = ""
@@ -33,13 +29,6 @@ class SearchActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.retrySearch.setOnClickListener { searchSongs(searchQuery) }
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(itunesBaseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        itunesService = retrofit.create(ItunesService::class.java)
 
         binding.searchScreenToolbar.setOnClickListener {
             finish()
@@ -73,7 +62,14 @@ class SearchActivity : BaseActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                binding.clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                if (s.isNullOrEmpty()) {
+                    binding.clearIcon.visibility = View.GONE
+                    binding.nothingFoundPlaceholder.visibility = View.GONE
+                    binding.noConnectionPlaceholder.visibility = View.GONE
+                    binding.rvListOfTracks.visibility = View.GONE
+                } else {
+                    binding.clearIcon.visibility = View.VISIBLE
+                }
             }
         })
     }
@@ -89,21 +85,19 @@ class SearchActivity : BaseActivity() {
             return
         }
 
-        itunesService.searchSongs(query).enqueue(object : Callback<ItunesResponse> {
+        RetrofitCreation.itunesService.searchSongs(query).enqueue(object : Callback<ItunesResponse> {
             override fun onResponse(
                 call: Call<ItunesResponse>,
                 response: Response<ItunesResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val songs = response.body()?.results
-                    if (!songs.isNullOrEmpty()) {
-                        showRecyclerView(songs)
-                    } else {
-                        showNothingFoundPlaceholder()
-                    }
+            ) = if (response.isSuccessful) {
+                val songs = response.body()?.results
+                if (!songs.isNullOrEmpty()) {
+                    showRecyclerView(songs)
                 } else {
-                    showNoConnectionPlaceholder()
+                    showNothingFoundPlaceholder()
                 }
+            } else {
+                showNoConnectionPlaceholder()
             }
 
             override fun onFailure(call: Call<ItunesResponse>, t: Throwable) {
