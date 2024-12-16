@@ -1,21 +1,18 @@
 package com.example.playlistmaker
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.databinding.ItemTrackBinding
 
 class TrackAdapter(private val tracks: List<Track>) :
     RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_track, parent, false)
-        return TrackViewHolder(view)
+        val binding = ItemTrackBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return TrackViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
@@ -24,22 +21,17 @@ class TrackAdapter(private val tracks: List<Track>) :
 
     override fun getItemCount(): Int = tracks.size
 
-    class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val trackName: TextView = itemView.findViewById(R.id.trackName)
-        private val artistName: TextView = itemView.findViewById(R.id.artistName)
-        private val trackTime: TextView = itemView.findViewById(R.id.trackTime)
-        private val artwork: ImageView = itemView.findViewById(R.id.imageView)
-
+    class TrackViewHolder(private val binding: ItemTrackBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(track: Track) {
-            trackName.text = track.trackName
-            artistName.text = track.artistName
-            trackTime.text = track.trackTime
+            binding.tvTrackName.text = track.trackName
+            binding.tvArtistName.text = track.artistName
+            binding.tvTrackTime.text = track.trackTimeMillis
 
-            Glide.with(itemView)
+            Glide.with(binding.root)
                 .load(track.artworkUrl100)
-                .placeholder(R.drawable.ic_placeholder)
+                .placeholder(R.drawable.ph_no_track_image)
                 .transform(RoundedCorners(2))
-                .into(artwork)
+                .into(binding.ivTrackIcon)
         }
     }
 }

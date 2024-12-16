@@ -2,29 +2,33 @@ package com.example.playlistmaker
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.example.playlistmaker.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val button1: Button = findViewById(R.id.button1)
-        val button2: Button = findViewById(R.id.button2)
-        val button3: Button = findViewById(R.id.button3)
-
-        button1.setOnClickListener {
+        binding.buttonSearchActivity.setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
-        button2.setOnClickListener {
+        binding.buttonLibraryActivity.setOnClickListener {
             startActivity(Intent(this, LibraryActivity::class.java))
         }
 
-        button3.setOnClickListener {
+        binding.buttonSettingsActivity.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+
+        val color = ContextCompat.getColor(this, R.color.main_activity_background_tint)
+
+        window.statusBarColor = color
     }
 }

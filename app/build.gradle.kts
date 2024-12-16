@@ -7,6 +7,9 @@ android {
     namespace = "com.example.playlistmaker"
     compileSdk = 35
 
+    viewBinding {
+        enable = true
+    }
     defaultConfig {
         applicationId = "com.example.playlistmaker"
         minSdk = 29
@@ -46,5 +49,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation (libs.material.v161)
     implementation (libs.glide)
+    implementation (libs.gson)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.converter.gson)
     annotationProcessor (libs.compiler)
 }
