@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/backButton"
+        android:id="@+id/settingsScreenToolbar"
         style="@style/toolbar_style"
         app:title="@string/settings" />
 
@@ -34,7 +34,7 @@
         app:drawableRightCompat="@drawable/ic_support" />
 
     <TextView
-        android:id="@+id/user_agreement"
+        android:id="@+id/user_agreement_button"
         style="@style/settings_screen_text_view_style"
         android:text="@string/user_agreement"
         app:drawableRightCompat="@drawable/ic_arrow_forward" />
