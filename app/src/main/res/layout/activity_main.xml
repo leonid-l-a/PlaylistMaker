@@ -9,7 +9,7 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tvAppName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/ys_display_medium"
@@ -26,7 +26,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/buttonLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
@@ -37,22 +36,22 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView">
+        app:layout_constraintTop_toBottomOf="@id/tvAppName">
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/buttonSearchActivity"
             style="@style/main_screen_button_style"
             android:text="@string/search"
             app:icon="@drawable/ic_search" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/buttonLibraryActivity"
             style="@style/main_screen_button_style"
             android:text="@string/library"
             app:icon="@drawable/ic_library" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/buttonSettingsActivity"
             style="@style/main_screen_button_style"
             android:text="@string/settings"
             app:icon="@drawable/ic_settings" />
