@@ -44,7 +44,6 @@
             android:textSize="16sp" />
 
         <ImageView
-            android:visibility="gone"
             android:id="@+id/clearIcon"
             android:layout_width="16dp"
             android:layout_height="16dp"
@@ -53,7 +52,7 @@
             android:src="@drawable/ic_button_clear"
             app:tint="@color/search_line_hint_color"
             android:visibility="gone"/>
-
++
     </LinearLayout>
 
     <LinearLayout
@@ -128,20 +127,33 @@
             android:text="@string/search_history"
             style="@style/search_screen_text_style"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:visibility="visible"
-            android:id="@+id/rvHistoryList"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/common_screen_background_tint"/>
-        
-        <Button
-            android:id="@+id/clearHistoryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear_history"
-            android:layout_gravity="center_horizontal"
-            style="@style/search_screen_button_retry_research_style"/>
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:visibility="visible"
+                    android:id="@+id/rvHistoryList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/common_screen_background_tint"/>
+
+                <Button
+                    android:layout_marginTop="28dp"
+                    android:id="@+id/clearHistoryButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear_history"
+                    android:layout_gravity="center_horizontal"
+                    style="@style/search_screen_button_retry_research_style"
+                    android:layout_marginBottom="8dp"/>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 </LinearLayout>

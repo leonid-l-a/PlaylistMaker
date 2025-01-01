@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
@@ -9,13 +10,15 @@ import com.example.playlistmaker.databinding.ActivitySettingsBinding
 class SettingsActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sharedPreferences = getSharedPreferences("APP_PREFERENCES", MODE_PRIVATE)
 
         binding.settingsScreenToolbar.setOnClickListener {
             finish()
@@ -33,8 +36,8 @@ class SettingsActivity : BaseActivity() {
             openUserAgreement()
         }
 
-        val currentMode = AppCompatDelegate.getDefaultNightMode()
-        binding.switchDarkMode.isChecked = currentMode == AppCompatDelegate.MODE_NIGHT_YES
+        val isDarkMode = sharedPreferences.getBoolean("IS_DARK_MODE", false)
+        binding.switchDarkMode.isChecked = isDarkMode
 
         binding.switchDarkMode.setOnClickListener {
             val newMode = if (binding.switchDarkMode.isChecked) {
@@ -43,8 +46,9 @@ class SettingsActivity : BaseActivity() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
             AppCompatDelegate.setDefaultNightMode(newMode)
-        }
 
+            sharedPreferences.edit().putBoolean("IS_DARK_MODE", binding.switchDarkMode.isChecked).apply()
+        }
     }
 
     private fun shareApp() {
