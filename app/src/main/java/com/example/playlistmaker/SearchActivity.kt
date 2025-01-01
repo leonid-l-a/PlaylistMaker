@@ -20,42 +20,19 @@ import retrofit2.converter.gson.GsonConverterFactory
 class SearchActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var searchHistory: SearchHistory
     private val itunesBaseUrl = "https://itunes.apple.com"
     private lateinit var itunesService: ItunesService
+
+    companion object {
+        var searchQuery: String = ""
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        searchHistory = SearchHistory(this)
-
-        val onTrackClickListener = { track: Track ->
-            searchHistory.addTrackToHistory(track)
-            updateHistoryView()
-        }
-
-        binding.rvListOfTracks.layoutManager = LinearLayoutManager(this)
-        binding.rvListOfTracks.adapter = TrackAdapter(emptyList(), onTrackClickListener)
-
-        binding.rvHistoryList.layoutManager = LinearLayoutManager(this)
-        binding.rvHistoryList.adapter = TrackAdapter(emptyList(), onTrackClickListener)
-
-        binding.clearHistoryButton.setOnClickListener {
-            searchHistory.clearHistory()
-            updateHistoryView()
-            binding.searchEditText.setText("")
-            binding.searchEditText.requestFocus()
-            showKeyboard()
-        }
-
-        binding.retrySearch.setOnClickListener {
-            val query = binding.searchEditText.text.toString()
-            if (query.isNotEmpty()) {
-                searchSongs(query)
-            }
-        }
+        binding.retrySearch.setOnClickListener { searchSongs(searchQuery) }
 
         val retrofit = Retrofit.Builder()
             .baseUrl(itunesBaseUrl)
@@ -68,19 +45,26 @@ class SearchActivity : BaseActivity() {
             finish()
         }
 
+        binding.searchEditText.setText(searchQuery)
+
         binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val query = binding.searchEditText.text.toString()
                 if (query.isNotEmpty()) {
+                    searchQuery = query
                     searchSongs(query)
                 } else {
-                    binding.rvListOfTracks.visibility = View.GONE
-                    updateHistoryView()
+                    showNoConnectionPlaceholder()
                 }
                 true
             } else {
                 false
             }
+        }
+
+        binding.clearIcon.setOnClickListener {
+            binding.searchEditText.setText("")
+            hideKeyboard()
         }
 
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
@@ -90,12 +74,6 @@ class SearchActivity : BaseActivity() {
 
             override fun afterTextChanged(s: Editable?) {
                 binding.clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-                binding.historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
-
-                if (s.isNullOrEmpty()) {
-                    binding.rvListOfTracks.visibility = View.GONE
-                    updateHistoryView()
-                }
             }
         })
 
@@ -108,16 +86,9 @@ class SearchActivity : BaseActivity() {
         updateHistoryView()
     }
 
-    private fun updateHistoryView() {
-        val history = searchHistory.getHistory()
-        if (history.isNotEmpty()) {
-            binding.historyLayout.visibility = View.VISIBLE
-            binding.searchEditText.clearFocus()
-            hideKeyboard()
-        } else {
-            binding.historyLayout.visibility = View.GONE
-        }
-        (binding.rvHistoryList.adapter as TrackAdapter).updateData(history)
+    override fun onDestroy() {
+        super.onDestroy()
+        searchQuery = ""
     }
 
     private fun searchSongs(query: String) {
@@ -163,7 +134,8 @@ class SearchActivity : BaseActivity() {
             )
         }
 
-        (binding.rvListOfTracks.adapter as TrackAdapter).updateData(tracks)
+        binding.rvListOfTracks.layoutManager = LinearLayoutManager(this)
+        binding.rvListOfTracks.adapter = TrackAdapter(tracks)
     }
 
     private fun showNoConnectionPlaceholder() {
@@ -181,11 +153,6 @@ class SearchActivity : BaseActivity() {
     private fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
-    }
-
-    private fun showKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(binding.searchEditText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun isNetworkAvailable(): Boolean {
