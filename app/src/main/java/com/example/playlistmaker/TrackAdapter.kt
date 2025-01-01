@@ -7,8 +7,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.databinding.ItemTrackBinding
 
-class TrackAdapter(private val tracks: List<Track>) :
-    RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(
+    private var tracks: List<Track>,
+    private val onItemClickListener: (Track) -> Unit
+) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+
+    fun updateData(newTracks: List<Track>) {
+        tracks = newTracks
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding = ItemTrackBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -17,6 +24,9 @@ class TrackAdapter(private val tracks: List<Track>) :
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
+        holder.itemView.setOnClickListener {
+            onItemClickListener(tracks[position])
+        }
     }
 
     override fun getItemCount(): Int = tracks.size

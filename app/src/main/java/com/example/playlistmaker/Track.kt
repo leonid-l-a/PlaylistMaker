@@ -18,5 +18,3 @@ data class Track(
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(trackTimeMillis.toLong())
     }
 }
-
-
