@@ -36,6 +36,7 @@
             android:inputType="text"
             android:maxLength="50"
             android:maxLines="1"
+            android:imeOptions="actionDone"
             android:paddingStart="12dp"
             android:textColor="@color/search_input_text_color"
             android:textColorHint="@color/search_line_hint_color"
@@ -52,7 +53,7 @@
             android:src="@drawable/ic_button_clear"
             app:tint="@color/search_line_hint_color"
             android:visibility="gone"/>
-+
+
     </LinearLayout>
 
     <LinearLayout
