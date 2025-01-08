@@ -36,6 +36,7 @@
             android:inputType="text"
             android:maxLength="50"
             android:maxLines="1"
+            android:imeOptions="actionDone"
             android:paddingStart="12dp"
             android:textColor="@color/search_input_text_color"
             android:textColorHint="@color/search_line_hint_color"
@@ -72,7 +73,7 @@
             android:src="@drawable/ph_no_connection" />
 
         <TextView
-            style="@style/search_screen_placeholders_text_style"
+            style="@style/search_screen_text_style"
             android:text="@string/no_connection_text" />
 
         <Button
@@ -101,16 +102,59 @@
             android:src="@drawable/ph_nothing_found" />
 
         <TextView
-            style="@style/search_screen_placeholders_text_style"
+            style="@style/search_screen_text_style"
             android:text="@string/nothing_found" />
 
     </LinearLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView
+        android:visibility="visible"
         android:id="@+id/rvListOfTracks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/medium_padding"
         android:backgroundTint="@color/common_screen_background_tint"/>
+
+    <LinearLayout
+        android:id="@+id/historyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="24dp"
+        android:visibility="gone">
+
+        <TextView
+            android:text="@string/search_history"
+            style="@style/search_screen_text_style"/>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:visibility="visible"
+                    android:id="@+id/rvHistoryList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/common_screen_background_tint"/>
+
+                <Button
+                    android:layout_marginTop="28dp"
+                    android:id="@+id/clearHistoryButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear_history"
+                    android:layout_gravity="center_horizontal"
+                    style="@style/search_screen_button_retry_research_style"
+                    android:layout_marginBottom="8dp"/>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
 </LinearLayout>

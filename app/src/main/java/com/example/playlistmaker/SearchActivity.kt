@@ -14,46 +14,73 @@ import com.example.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-
-    companion object {
-        var searchQuery: String = ""
-    }
+    private lateinit var searchHistory: SearchHistory
+    private val itunesBaseUrl = "https://itunes.apple.com"
+    private lateinit var itunesService: ItunesService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.retrySearch.setOnClickListener { searchSongs(searchQuery) }
+        searchHistory = SearchHistory(this)
+
+        val onTrackClickListener = { track: Track ->
+            searchHistory.addTrackToHistory(track)
+            updateHistoryView()
+        }
+
+        binding.rvListOfTracks.layoutManager = LinearLayoutManager(this)
+        binding.rvListOfTracks.adapter = TrackAdapter(emptyList(), onTrackClickListener)
+
+        binding.rvHistoryList.layoutManager = LinearLayoutManager(this)
+        binding.rvHistoryList.adapter = TrackAdapter(emptyList(), onTrackClickListener)
+
+        binding.clearHistoryButton.setOnClickListener {
+            searchHistory.clearHistory()
+            updateHistoryView()
+            binding.searchEditText.setText("")
+            binding.searchEditText.requestFocus()
+            showKeyboard()
+        }
+
+        binding.retrySearch.setOnClickListener {
+            val query = binding.searchEditText.text.toString()
+            if (query.isNotEmpty()) {
+                searchSongs(query)
+            }
+        }
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(itunesBaseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        itunesService = retrofit.create(ItunesService::class.java)
 
         binding.searchScreenToolbar.setOnClickListener {
             finish()
         }
 
-        binding.searchEditText.setText(searchQuery)
-
         binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val query = binding.searchEditText.text.toString()
                 if (query.isNotEmpty()) {
-                    searchQuery = query
                     searchSongs(query)
                 } else {
-                    showNoConnectionPlaceholder()
+                    binding.rvListOfTracks.visibility = View.GONE
+                    updateHistoryView()
                 }
                 true
             } else {
                 false
             }
-        }
-
-        binding.clearIcon.setOnClickListener {
-            binding.searchEditText.setText("")
-            hideKeyboard()
         }
 
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
@@ -62,21 +89,36 @@ class SearchActivity : BaseActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
+                binding.clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                binding.historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
+
                 if (s.isNullOrEmpty()) {
-                    binding.clearIcon.visibility = View.GONE
-                    binding.nothingFoundPlaceholder.visibility = View.GONE
-                    binding.noConnectionPlaceholder.visibility = View.GONE
                     binding.rvListOfTracks.visibility = View.GONE
-                } else {
-                    binding.clearIcon.visibility = View.VISIBLE
+                    updateHistoryView()
                 }
             }
         })
+
+        updateHistoryView()
+
+        binding.clearIcon.setOnClickListener {
+            binding.searchEditText.setText("")
+            hideKeyboard()
+            binding.rvListOfTracks.visibility = View.GONE
+            updateHistoryView()
+            binding.searchEditText.clearFocus()
+        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        searchQuery = ""
+
+    private fun updateHistoryView() {
+        val history = searchHistory.getHistory()
+        if (history.isNotEmpty()) {
+            binding.historyLayout.visibility = View.VISIBLE
+        } else {
+            binding.historyLayout.visibility = View.GONE
+        }
+        (binding.rvHistoryList.adapter as TrackAdapter).updateData(history)
     }
 
     private fun searchSongs(query: String) {
@@ -85,19 +127,21 @@ class SearchActivity : BaseActivity() {
             return
         }
 
-        RetrofitCreation.itunesService.searchSongs(query).enqueue(object : Callback<ItunesResponse> {
+        itunesService.searchSongs(query).enqueue(object : Callback<ItunesResponse> {
             override fun onResponse(
                 call: Call<ItunesResponse>,
                 response: Response<ItunesResponse>
-            ) = if (response.isSuccessful) {
-                val songs = response.body()?.results
-                if (!songs.isNullOrEmpty()) {
-                    showRecyclerView(songs)
+            ) {
+                if (response.isSuccessful) {
+                    val songs = response.body()?.results
+                    if (!songs.isNullOrEmpty()) {
+                        showRecyclerView(songs)
+                    } else {
+                        showNothingFoundPlaceholder()
+                    }
                 } else {
-                    showNothingFoundPlaceholder()
+                    showNoConnectionPlaceholder()
                 }
-            } else {
-                showNoConnectionPlaceholder()
             }
 
             override fun onFailure(call: Call<ItunesResponse>, t: Throwable) {
@@ -120,8 +164,7 @@ class SearchActivity : BaseActivity() {
             )
         }
 
-        binding.rvListOfTracks.layoutManager = LinearLayoutManager(this)
-        binding.rvListOfTracks.adapter = TrackAdapter(tracks)
+        (binding.rvListOfTracks.adapter as TrackAdapter).updateData(tracks)
     }
 
     private fun showNoConnectionPlaceholder() {
@@ -139,6 +182,11 @@ class SearchActivity : BaseActivity() {
     private fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
+    }
+
+    private fun showKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(binding.searchEditText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun isNetworkAvailable(): Boolean {
