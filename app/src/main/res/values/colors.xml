@@ -14,4 +14,5 @@
     <color name="search_line_hint_color">#AEAFB4</color>
     <color name="search_input_text_color">#1A1B22</color>
     <color name="track_name_color">#000000</color>
+    <color name="player_activity_button_color">#1A1B2240</color>
 </resources>
