@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -28,8 +29,17 @@ class PlayerActivity : AppCompatActivity() {
     private fun updateUI(track: Track) {
         binding.tvTrackName.text = track.trackName
         binding.tvArtistName.text = track.artistName
-        binding.trackDurability.text = track.getFormattedTrackTime()
-        binding.trackAlbumName.text = track.collectionName ?: "Unknown Album"
+        binding.trackDurability.text = track.trackTimeMillis
+
+        if (track.collectionName.isNullOrEmpty()) {
+            binding.trackAlbumNameText.visibility = View.GONE
+            binding.trackAlbumName.visibility = View.GONE
+        } else {
+            binding.trackAlbumNameText.visibility = View.VISIBLE
+            binding.trackAlbumName.visibility = View.VISIBLE
+            binding.trackAlbumName.text = track.collectionName
+        }
+
         binding.trackYear.text = track.releaseDate.take(4)
         binding.trackGenre.text = track.primaryGenreName
         binding.trackCountry.text = track.country
