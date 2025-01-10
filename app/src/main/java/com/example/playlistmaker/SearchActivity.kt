@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
@@ -34,6 +35,10 @@ class SearchActivity : BaseActivity() {
         val onTrackClickListener = { track: Track ->
             searchHistory.addTrackToHistory(track)
             updateHistoryView()
+
+            val intent = Intent(this, PlayerActivity::class.java)
+            intent.putExtra("track", track)
+            startActivity(intent)
         }
 
         binding.rvListOfTracks.layoutManager = LinearLayoutManager(this)
@@ -110,7 +115,6 @@ class SearchActivity : BaseActivity() {
         }
     }
 
-
     private fun updateHistoryView() {
         val history = searchHistory.getHistory()
         if (history.isNotEmpty()) {
@@ -160,7 +164,11 @@ class SearchActivity : BaseActivity() {
                 trackName = it.trackName,
                 artistName = it.artistName,
                 trackTimeMillis = it.getFormattedTrackTime(),
-                artworkUrl100 = it.artworkUrl100
+                artworkUrl100 = it.artworkUrl100,
+                collectionName = it.collectionName ?: "",
+                releaseDate = it.releaseDate,
+                primaryGenreName = it.primaryGenreName,
+                country = it.country
             )
         }
 

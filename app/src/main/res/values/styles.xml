@@ -9,7 +9,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/big_line_height</item>
         <item name="fontFamily">@font/ys_display_regular</item>
-        <item name="fontWeight">400</item>
+        <item name="android:textFontWeight">400</item>
         <item name="android:drawableTint">@color/settings_activity_icon_fill_color</item>
     </style>
 
@@ -25,7 +25,7 @@
         <item name="iconGravity">textStart</item>
         <item name="iconTint">@color/main_activity_button_text_color</item>
         <item name="fontFamily">@font/ys_display_medium</item>
-        <item name="fontWeight">500</item>
+        <item name="android:textFontWeight">500</item>
     </style>
 
     <style name="toolbar_style" parent="header_style">
@@ -45,7 +45,7 @@
     <style name="track_artist_name_and_time_style">
         <item name="android:textSize">11sp</item>
         <item name="fontFamily">@font/ys_display_regular</item>
-        <item name="fontWeight">400</item>
+        <item name="android:textFontWeight">400</item>
         <item name="android:textColor">@color/settings_activity_icon_fill_color</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -56,7 +56,7 @@
         <item name="fontFamily">@font/ys_display_medium</item>
         <item name="android:textSize">19sp</item>
         <item name="android:textColor">@color/common_text_color</item>
-        <item name="fontWeight">400</item>
+        <item name="android:textFontWeight">400</item>
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
@@ -65,5 +65,27 @@
     <style name="search_screen_button_retry_research_style">
         <item name="backgroundTint">@color/common_text_color</item>
         <item name="cornerRadius">54dp</item>
+    </style>
+    
+    <style name="player_screen_characteristics_names_style">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#AEAFB4</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
+
+    <style name="player_screen_characteristics_style">
+        <item name="android:gravity">center_vertical|end</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/common_text_color</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="layout_constraintStart_toEndOf">@id/textsBarrier</item>
+        <item name="android:ellipsize">end</item>
     </style>
 </resources>
