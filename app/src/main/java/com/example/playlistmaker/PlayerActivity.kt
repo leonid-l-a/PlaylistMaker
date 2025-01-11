@@ -26,29 +26,37 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUI(track: Track) {
-        binding.tvTrackName.text = track.trackName
-        binding.tvArtistName.text = track.artistName
-        binding.trackDurability.text = track.trackTimeMillis
+    private fun updateUI(track: Track) = with(binding) {
+        tvTrackName.text = track.trackName
+        tvArtistName.text = track.artistName
+        trackDurability.text = track.trackTimeMillis
 
         if (track.collectionName.isNullOrEmpty()) {
-            binding.trackAlbumNameText.visibility = View.GONE
-            binding.trackAlbumName.visibility = View.GONE
+            trackAlbumNameText.visibility = View.GONE
+            trackAlbumName.visibility = View.GONE
         } else {
-            binding.trackAlbumNameText.visibility = View.VISIBLE
-            binding.trackAlbumName.visibility = View.VISIBLE
-            binding.trackAlbumName.text = track.collectionName
+            trackAlbumNameText.visibility = View.VISIBLE
+            trackAlbumName.visibility = View.VISIBLE
+            trackAlbumName.text = track.collectionName
         }
 
-        binding.trackYear.text = track.releaseDate.take(4)
-        binding.trackGenre.text = track.primaryGenreName
-        binding.trackCountry.text = track.country
+        trackYear.text = track.releaseDate.take(4)
+        trackGenre.text = track.primaryGenreName
+        trackCountry.text = track.country
 
-        val imageUrl = track.artworkUrl100.replaceAfterLast("/", "512x512bb.jpg")
-        Glide.with(this)
-            .load(imageUrl)
-            .placeholder(R.drawable.ph_no_track_image)
-            .transform(RoundedCorners(8))
-            .into(binding.trackImage)
+        val imageUrl = track.artworkUrl100?.replaceAfterLast("/", "512x512bb.jpg")
+
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(this@PlayerActivity)
+                .load(imageUrl)
+                .placeholder(R.drawable.ph_no_track_image)
+                .transform(RoundedCorners(8))
+                .into(binding.trackImage)
+        } else {
+            Glide.with(this@PlayerActivity)
+                .load(R.drawable.ph_no_track_image)
+                .transform(RoundedCorners(8))
+                .into(binding.trackImage)
+        }
     }
 }

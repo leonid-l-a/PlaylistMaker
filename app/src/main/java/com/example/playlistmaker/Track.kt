@@ -14,7 +14,7 @@ data class Track(
     @SerializedName("trackTimeMillis")
     val trackTimeMillis: String,
     @SerializedName("artworkUrl100")
-    val artworkUrl100: String,
+    val artworkUrl100: String?,
     @SerializedName("collectionName")
     val collectionName: String?,
     @SerializedName("releaseDate")
