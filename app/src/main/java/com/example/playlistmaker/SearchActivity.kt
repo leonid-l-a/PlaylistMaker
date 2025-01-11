@@ -93,12 +93,12 @@ class SearchActivity : BaseActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-            override fun afterTextChanged(s: Editable?) {
-                binding.clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-                binding.historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
+            override fun afterTextChanged(s: Editable?) = with(binding) {
+                clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
 
                 if (s.isNullOrEmpty()) {
-                    binding.rvListOfTracks.visibility = View.GONE
+                    rvListOfTracks.visibility = View.GONE
                     updateHistoryView()
                 }
             }
@@ -154,10 +154,10 @@ class SearchActivity : BaseActivity() {
         })
     }
 
-    private fun showRecyclerView(songs: List<Track>) {
-        binding.rvListOfTracks.visibility = View.VISIBLE
-        binding.noConnectionPlaceholder.visibility = View.GONE
-        binding.nothingFoundPlaceholder.visibility = View.GONE
+    private fun showRecyclerView(songs: List<Track>) = with(binding) {
+        rvListOfTracks.visibility = View.VISIBLE
+        noConnectionPlaceholder.visibility = View.GONE
+        nothingFoundPlaceholder.visibility = View.GONE
 
         val tracks = songs.map {
             Track(
@@ -172,7 +172,7 @@ class SearchActivity : BaseActivity() {
             )
         }
 
-        (binding.rvListOfTracks.adapter as TrackAdapter).updateData(tracks)
+        (rvListOfTracks.adapter as TrackAdapter).updateData(tracks)
     }
 
     private fun showNoConnectionPlaceholder() {
