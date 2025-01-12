@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
@@ -34,6 +35,10 @@ class SearchActivity : BaseActivity() {
         val onTrackClickListener = { track: Track ->
             searchHistory.addTrackToHistory(track)
             updateHistoryView()
+
+            val intent = Intent(this, PlayerActivity::class.java)
+            intent.putExtra("track", track)
+            startActivity(intent)
         }
 
         binding.rvListOfTracks.layoutManager = LinearLayoutManager(this)
@@ -88,12 +93,12 @@ class SearchActivity : BaseActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-            override fun afterTextChanged(s: Editable?) {
-                binding.clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-                binding.historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
+            override fun afterTextChanged(s: Editable?) = with(binding) {
+                clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
 
                 if (s.isNullOrEmpty()) {
-                    binding.rvListOfTracks.visibility = View.GONE
+                    rvListOfTracks.visibility = View.GONE
                     updateHistoryView()
                 }
             }
@@ -109,7 +114,6 @@ class SearchActivity : BaseActivity() {
             binding.searchEditText.clearFocus()
         }
     }
-
 
     private fun updateHistoryView() {
         val history = searchHistory.getHistory()
@@ -150,21 +154,25 @@ class SearchActivity : BaseActivity() {
         })
     }
 
-    private fun showRecyclerView(songs: List<Track>) {
-        binding.rvListOfTracks.visibility = View.VISIBLE
-        binding.noConnectionPlaceholder.visibility = View.GONE
-        binding.nothingFoundPlaceholder.visibility = View.GONE
+    private fun showRecyclerView(songs: List<Track>) = with(binding) {
+        rvListOfTracks.visibility = View.VISIBLE
+        noConnectionPlaceholder.visibility = View.GONE
+        nothingFoundPlaceholder.visibility = View.GONE
 
         val tracks = songs.map {
             Track(
                 trackName = it.trackName,
                 artistName = it.artistName,
                 trackTimeMillis = it.getFormattedTrackTime(),
-                artworkUrl100 = it.artworkUrl100
+                artworkUrl100 = it.artworkUrl100,
+                collectionName = it.collectionName ?: "",
+                releaseDate = it.releaseDate,
+                primaryGenreName = it.primaryGenreName,
+                country = it.country
             )
         }
 
-        (binding.rvListOfTracks.adapter as TrackAdapter).updateData(tracks)
+        (rvListOfTracks.adapter as TrackAdapter).updateData(tracks)
     }
 
     private fun showNoConnectionPlaceholder() {

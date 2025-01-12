@@ -23,4 +23,13 @@
     <string name="nothing_found">Ничего не нашлось</string>
     <string name="search_history">Вы искали</string>
     <string name="clear_history">Очистить историю</string>
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="track_image">track image</string>
+    <string name="like">like_button\n</string>
+    <string name="track_durability">Длительность</string>
+    <string name="track_album_text">Альбом</string>
+    <string name="track_year_text">Год</string>
+    <string name="track_genre_text">Жанр</string>
+    <string name="track_country_text">Страна</string>
+    <string name="play_button">play button</string>
 </resources>
