@@ -5,10 +5,11 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.databinding.ActivitySearchBinding
@@ -24,6 +25,8 @@ class SearchActivity : BaseActivity() {
     private lateinit var searchHistory: SearchHistory
     private val itunesBaseUrl = "https://itunes.apple.com"
     private lateinit var itunesService: ItunesService
+    private val handler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,12 +37,12 @@ class SearchActivity : BaseActivity() {
 
         val onTrackClickListener = { track: Track ->
             searchHistory.addTrackToHistory(track)
-            updateHistoryView()
-
             val intent = Intent(this, PlayerActivity::class.java)
             intent.putExtra("track", track)
             startActivity(intent)
+            updateHistoryView()
         }
+
 
         binding.rvListOfTracks.layoutManager = LinearLayoutManager(this)
         binding.rvListOfTracks.adapter = TrackAdapter(emptyList(), onTrackClickListener)
@@ -73,33 +76,30 @@ class SearchActivity : BaseActivity() {
             finish()
         }
 
-        binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                val query = binding.searchEditText.text.toString()
-                if (query.isNotEmpty()) {
-                    searchSongs(query)
-                } else {
-                    binding.rvListOfTracks.visibility = View.GONE
-                    updateHistoryView()
-                }
-                true
-            } else {
-                false
-            }
-        }
-
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-            override fun afterTextChanged(s: Editable?) = with(binding) {
-                clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-                historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
+            override fun afterTextChanged(s: Editable?) {
+                with(binding) {
+                    clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                    historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
 
-                if (s.isNullOrEmpty()) {
-                    rvListOfTracks.visibility = View.GONE
-                    updateHistoryView()
+                    searchRunnable?.let { handler.removeCallbacks(it) }
+
+                    if (s.isNullOrEmpty()) {
+                        rvListOfTracks.visibility = View.GONE
+                        updateHistoryView()
+                    } else {
+                        searchRunnable = Runnable {
+                            val query = s.toString()
+                            if (query.isNotEmpty()) {
+                                showProgressBar()
+                                searchSongs(query)
+                            }
+                        }
+                        handler.postDelayed(searchRunnable!!, 2000)
+                    }
                 }
             }
         })
@@ -117,16 +117,13 @@ class SearchActivity : BaseActivity() {
 
     private fun updateHistoryView() {
         val history = searchHistory.getHistory()
-        if (history.isNotEmpty()) {
-            binding.historyLayout.visibility = View.VISIBLE
-        } else {
-            binding.historyLayout.visibility = View.GONE
-        }
+        binding.historyLayout.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
         (binding.rvHistoryList.adapter as TrackAdapter).updateData(history)
     }
 
     private fun searchSongs(query: String) {
         if (!isNetworkAvailable()) {
+            binding.progressBar.visibility = View.GONE
             showNoConnectionPlaceholder()
             return
         }
@@ -136,6 +133,8 @@ class SearchActivity : BaseActivity() {
                 call: Call<ItunesResponse>,
                 response: Response<ItunesResponse>
             ) {
+                binding.progressBar.visibility = View.GONE
+
                 if (response.isSuccessful) {
                     val songs = response.body()?.results
                     if (!songs.isNullOrEmpty()) {
@@ -149,9 +148,17 @@ class SearchActivity : BaseActivity() {
             }
 
             override fun onFailure(call: Call<ItunesResponse>, t: Throwable) {
+                binding.progressBar.visibility = View.GONE
                 showNoConnectionPlaceholder()
             }
         })
+    }
+
+    private fun showProgressBar() {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.rvListOfTracks.visibility = View.GONE
+        binding.noConnectionPlaceholder.visibility = View.GONE
+        binding.nothingFoundPlaceholder.visibility = View.GONE
     }
 
     private fun showRecyclerView(songs: List<Track>) = with(binding) {
@@ -168,7 +175,8 @@ class SearchActivity : BaseActivity() {
                 collectionName = it.collectionName ?: "",
                 releaseDate = it.releaseDate,
                 primaryGenreName = it.primaryGenreName,
-                country = it.country
+                country = it.country,
+                previewUrl = it.previewUrl
             )
         }
 
@@ -203,5 +211,15 @@ class SearchActivity : BaseActivity() {
         val network = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.searchEditText.clearFocus()
     }
 }

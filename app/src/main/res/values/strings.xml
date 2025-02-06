@@ -31,5 +31,7 @@
     <string name="track_year_text">Год</string>
     <string name="track_genre_text">Жанр</string>
     <string name="track_country_text">Страна</string>
-    <string name="play_button">play button</string>
+    <string name="play_button">play</string>
+    <string name="time_zero">00:00</string>
+    <string name="time_start">00:30</string>
 </resources>

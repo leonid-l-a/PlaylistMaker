@@ -109,7 +109,7 @@
             app:layout_constraintEnd_toStartOf="@id/ibLike"
             app:layout_constraintStart_toEndOf="@id/ibAddToPlaylist"
             app:layout_constraintTop_toBottomOf="@id/tvArtistName"
-            android:contentDescription="@string/play_button"/>
+            android:contentDescription="@string/play_button" />
 
         <ImageButton
             android:id="@+id/ibLike"
