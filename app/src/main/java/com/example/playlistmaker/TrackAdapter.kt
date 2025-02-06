@@ -1,5 +1,7 @@
 package com.example.playlistmaker
 
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +13,8 @@ class TrackAdapter(
     private var tracks: List<Track>,
     private val onItemClickListener: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+
+    private var isClickEnabled = true
 
     fun updateData(newTracks: List<Track>) {
         tracks = newTracks
@@ -24,14 +28,26 @@ class TrackAdapter(
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
+
+        holder.itemView.isEnabled = true
+
         holder.itemView.setOnClickListener {
+            if (!isClickEnabled) return@setOnClickListener
+
+            isClickEnabled = false
+
             onItemClickListener(tracks[position])
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                isClickEnabled = true
+            }, 2000)
         }
     }
 
     override fun getItemCount(): Int = tracks.size
 
-    class TrackViewHolder(private val binding: ItemTrackBinding) : RecyclerView.ViewHolder(binding.root) {
+    class TrackViewHolder(private val binding: ItemTrackBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(track: Track) {
             binding.tvTrackName.text = track.trackName
             binding.tvArtistName.text = track.artistName

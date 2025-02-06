@@ -36,7 +36,6 @@
             android:inputType="text"
             android:maxLength="50"
             android:maxLines="1"
-            android:imeOptions="actionDone"
             android:paddingStart="12dp"
             android:textColor="@color/search_input_text_color"
             android:textColorHint="@color/search_line_hint_color"
@@ -114,7 +113,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/medium_padding"
-        android:backgroundTint="@color/common_screen_background_tint"/>
+        android:backgroundTint="@color/common_screen_background_tint" />
 
     <LinearLayout
         android:id="@+id/historyLayout"
@@ -157,4 +156,12 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="140dp"
+        android:visibility="gone"
+        android:indeterminateTint="@color/search_activity_progressbar_color"/>
 </LinearLayout>
