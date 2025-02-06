@@ -68,7 +68,7 @@ class PlayerActivity : BaseActivity() {
     private fun updateUI(track: Track) = with(binding) {
         tvTrackName.text = track.trackName
         tvArtistName.text = track.artistName
-        trackDurability.text = getString(R.string.time_start)
+        trackDurability.text = track.trackTimeMillis
 
         if (track.collectionName.isNullOrEmpty()) {
             trackAlbumNameText.visibility = View.GONE
