@@ -2,8 +2,7 @@ package com.example.playlistmaker
 
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.CountDownTimer
 import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -12,36 +11,14 @@ import java.util.Locale
 
 class PlayerActivity : BaseActivity() {
 
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-    }
-
     private lateinit var binding: ActivityPlayerBinding
-    private var playerState = STATE_DEFAULT
+    private var playerState = PlayerState.DEFAULT
     private var mediaPlayer = MediaPlayer()
     private var shouldPlayOnPrepared = false
 
     private var trackDurationMillis: Long = 30000L
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val updateRunnable = object : Runnable {
-        override fun run() {
-            if (mediaPlayer.isPlaying) {
-                val remainingMillis = trackDurationMillis - mediaPlayer.currentPosition
-                if (remainingMillis > 0) {
-                    val minutes = remainingMillis / 60000
-                    val seconds = (remainingMillis % 60000) / 1000
-                    binding.timePlayed.text = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
-                    handler.postDelayed(this, 1000)
-                } else {
-                    binding.timePlayed.text = getString(R.string.time_zero)
-                }
-            }
-        }
-    }
+    private var countDownTimer: CountDownTimer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,18 +62,11 @@ class PlayerActivity : BaseActivity() {
 
         val imageUrl = track.artworkUrl100?.replaceAfterLast("/", "512x512bb.jpg")
 
-        if (!imageUrl.isNullOrEmpty()) {
-            Glide.with(this@PlayerActivity)
-                .load(imageUrl)
-                .placeholder(R.drawable.ph_no_track_image)
-                .transform(RoundedCorners(8))
-                .into(binding.trackImage)
-        } else {
-            Glide.with(this@PlayerActivity)
-                .load(R.drawable.ph_no_track_image)
-                .transform(RoundedCorners(8))
-                .into(binding.trackImage)
-        }
+        Glide.with(this@PlayerActivity)
+            .load(imageUrl ?: R.drawable.ph_no_track_image)
+            .placeholder(R.drawable.ph_no_track_image)
+            .transform(RoundedCorners(8))
+            .into(binding.trackImage)
     }
 
     private fun preparePlayer(url: String) {
@@ -104,28 +74,24 @@ class PlayerActivity : BaseActivity() {
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
             binding.ibPlay.isEnabled = true
-            playerState = STATE_PREPARED
+            playerState = PlayerState.PREPARED
             if (shouldPlayOnPrepared) {
                 startPlayer()
                 shouldPlayOnPrepared = false
             }
         }
         mediaPlayer.setOnCompletionListener {
-            playerState = STATE_PREPARED
+            playerState = PlayerState.PREPARED
             binding.ibPlay.setImageResource(R.drawable.ic_play)
             binding.timePlayed.text = getString(R.string.time_zero)
-            handler.removeCallbacks(updateRunnable)
+            cancelCountDownTimer()
         }
     }
 
     private fun playbackControl() {
         when (playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
-            }
+            PlayerState.PLAYING -> pausePlayer()
+            PlayerState.PREPARED, PlayerState.PAUSED -> startPlayer()
             else -> {
                 shouldPlayOnPrepared = true
             }
@@ -134,18 +100,39 @@ class PlayerActivity : BaseActivity() {
 
     private fun startPlayer() {
         mediaPlayer.start()
-        playerState = STATE_PLAYING
+        playerState = PlayerState.PLAYING
         binding.ibPlay.setImageResource(R.drawable.ic_pause)
-        handler.post(updateRunnable)
+
+        cancelCountDownTimer()
+
+        val remainingMillis = trackDurationMillis - mediaPlayer.currentPosition
+        countDownTimer = object : CountDownTimer(remainingMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val minutes = millisUntilFinished / 60000
+                val seconds = (millisUntilFinished % 60000) / 1000
+                binding.timePlayed.text =
+                    String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+            }
+
+            override fun onFinish() {
+                binding.timePlayed.text = getString(R.string.time_zero)
+            }
+        }
+        countDownTimer?.start()
     }
 
     private fun pausePlayer() {
         if (mediaPlayer.isPlaying) {
             mediaPlayer.pause()
         }
-        playerState = STATE_PAUSED
+        playerState = PlayerState.PAUSED
         binding.ibPlay.setImageResource(R.drawable.ic_play)
-        handler.removeCallbacks(updateRunnable)
+        cancelCountDownTimer()
+    }
+
+    private fun cancelCountDownTimer() {
+        countDownTimer?.cancel()
+        countDownTimer = null
     }
 
     override fun onPause() {
@@ -156,6 +143,8 @@ class PlayerActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer.release()
-        handler.removeCallbacks(updateRunnable)
+        cancelCountDownTimer()
     }
 }
+
+
