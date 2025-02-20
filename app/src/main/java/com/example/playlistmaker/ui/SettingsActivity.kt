@@ -5,10 +5,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.domain.interactor.SettingsInteractor
-import com.example.playlistmaker.domain.use_case.settings.OpenUserAgreementUseCase
-import com.example.playlistmaker.domain.use_case.settings.SendSupportEmailUseCase
-import com.example.playlistmaker.domain.use_case.settings.ShareAppUseCase
-import com.example.playlistmaker.domain.use_case.settings.ToggleDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.impl.settings.OpenUserAgreementUseCase
+import com.example.playlistmaker.domain.use_case.impl.settings.SendSupportEmailUseCase
+import com.example.playlistmaker.domain.use_case.impl.settings.ShareAppUseCase
+import com.example.playlistmaker.domain.use_case.impl.settings.ToggleDarkModeUseCase
 import com.example.playlistmaker.presentation.BaseActivity
 
 class SettingsActivity : BaseActivity() {

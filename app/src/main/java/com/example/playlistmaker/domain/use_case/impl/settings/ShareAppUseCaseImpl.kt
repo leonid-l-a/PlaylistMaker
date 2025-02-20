@@ -1,11 +1,11 @@
-package com.example.playlistmaker.domain.use_case.settings
+package com.example.playlistmaker.domain.use_case.impl.settings
 
 import android.content.Context
 import android.content.Intent
 import com.example.playlistmaker.R
 
-class ShareAppUseCase(private val context: Context) {
-    fun shareApp() {
+class ShareAppUseCaseImpl(private val context: Context) : ShareAppUseCase {
+    override fun shareApp() {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_text))

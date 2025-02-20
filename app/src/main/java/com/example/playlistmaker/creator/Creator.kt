@@ -15,11 +15,16 @@ import com.example.playlistmaker.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.domain.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchSongsInteractor
 import com.example.playlistmaker.domain.interactor.SettingsInteractor
-import com.example.playlistmaker.domain.use_case.main.SetCurrentModeUseCase
-import com.example.playlistmaker.domain.use_case.settings.OpenUserAgreementUseCase
-import com.example.playlistmaker.domain.use_case.settings.SendSupportEmailUseCase
-import com.example.playlistmaker.domain.use_case.settings.ShareAppUseCase
-import com.example.playlistmaker.domain.use_case.settings.ToggleDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.impl.main.SetCurrentModeUseCase
+import com.example.playlistmaker.domain.use_case.impl.main.SetCurrentModeUseCaseImpl
+import com.example.playlistmaker.domain.use_case.impl.settings.OpenUserAgreementUseCase
+import com.example.playlistmaker.domain.use_case.impl.settings.OpenUserAgreementUseCaseImpl
+import com.example.playlistmaker.domain.use_case.impl.settings.SendSupportEmailUseCase
+import com.example.playlistmaker.domain.use_case.impl.settings.SendSupportEmailUseCaseImpl
+import com.example.playlistmaker.domain.use_case.impl.settings.ShareAppUseCase
+import com.example.playlistmaker.domain.use_case.impl.settings.ShareAppUseCaseImpl
+import com.example.playlistmaker.domain.use_case.impl.settings.ToggleDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.impl.settings.ToggleDarkModeUseCaseImpl
 
 object Creator {
     private lateinit var appContext: Context
@@ -38,23 +43,23 @@ object Creator {
     }
 
     fun provideShareAppUseCase(): ShareAppUseCase {
-        return ShareAppUseCase(appContext)
+        return ShareAppUseCaseImpl(appContext)
     }
 
     fun provideSendSupportEmailUseCase(): SendSupportEmailUseCase {
-        return SendSupportEmailUseCase(appContext)
+        return SendSupportEmailUseCaseImpl(appContext)
     }
 
     fun provideOpenUserAgreementUseCase(): OpenUserAgreementUseCase {
-        return OpenUserAgreementUseCase(appContext)
+        return OpenUserAgreementUseCaseImpl(appContext)
     }
 
     fun provideToggleDarkModeUseCase(): ToggleDarkModeUseCase {
-        return ToggleDarkModeUseCase(provideSettingsInteractor())
+        return ToggleDarkModeUseCaseImpl(provideSettingsInteractor())
     }
 
     fun provideSetCurrentModeUseCase(): SetCurrentModeUseCase {
-        return SetCurrentModeUseCase()
+        return SetCurrentModeUseCaseImpl()
     }
 
     fun createSearchSongsInteractor(): SearchSongsInteractor {
@@ -72,5 +77,4 @@ object Creator {
     fun providePlayerInteractor(): PlayerInteractor {
         return PlayerInteractorImpl(PlayerRepositoryImpl())
     }
-
 }

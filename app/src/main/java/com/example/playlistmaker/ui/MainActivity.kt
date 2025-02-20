@@ -8,7 +8,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityMainBinding
 import com.example.playlistmaker.domain.interactor.SettingsInteractor
-import com.example.playlistmaker.domain.use_case.main.SetCurrentModeUseCase
+import com.example.playlistmaker.domain.use_case.impl.main.SetCurrentModeUseCase
 
 class MainActivity : AppCompatActivity() {
 
