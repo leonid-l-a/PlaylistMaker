@@ -1,10 +1,11 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation
 
 import android.os.Bundle
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import com.example.playlistmaker.R
 
 open class BaseActivity : AppCompatActivity() {
 

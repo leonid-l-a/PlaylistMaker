@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.data.dto
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Parcelize
-data class Track(
+data class TrackDto(
     @SerializedName("trackName")
     val trackName: String,
     @SerializedName("artistName")

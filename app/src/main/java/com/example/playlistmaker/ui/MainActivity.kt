@@ -1,30 +1,32 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import com.example.playlistmaker.R
+import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityMainBinding
+import com.example.playlistmaker.domain.interactor.SettingsInteractor
+import com.example.playlistmaker.domain.use_case.main.SetCurrentModeUseCase
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var settingsInteractor: SettingsInteractor
+    private lateinit var setCurrentModeUseCase: SetCurrentModeUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        settingsInteractor = Creator.provideSettingsInteractor()
 
-        val sharedPreferences = getSharedPreferences("APP_PREFERENCES", MODE_PRIVATE)
+        val isDarkMode = settingsInteractor.getSettings().isDarkModeEnabled
 
-        val isDarkMode = sharedPreferences.getBoolean("IS_DARK_MODE", false)
+        setCurrentModeUseCase = Creator.provideSetCurrentModeUseCase()
+        setCurrentModeUseCase.setCurrentMode(isDarkMode)
 
-        if (isDarkMode) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
 
         binding.buttonSearchActivity.setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
