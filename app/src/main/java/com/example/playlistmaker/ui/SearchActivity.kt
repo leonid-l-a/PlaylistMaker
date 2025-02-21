@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui
 
 import android.content.Context
 import android.content.Intent
@@ -12,19 +12,16 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySearchBinding
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.playlistmaker.domain.entitie.Track
+import com.example.playlistmaker.presentation.BaseActivity
 
 class SearchActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var searchHistory: SearchHistory
-    private val itunesBaseUrl = "https://itunes.apple.com"
-    private lateinit var itunesService: ItunesService
+    private lateinit var searchHistoryInteractor: com.example.playlistmaker.domain.interactor.SearchHistoryInteractor
+    private lateinit var searchSongsInteractor: com.example.playlistmaker.domain.interactor.SearchSongsInteractor
     private val handler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
 
@@ -33,16 +30,16 @@ class SearchActivity : BaseActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        searchHistory = SearchHistory(this)
+        searchHistoryInteractor = Creator.createSearchHistoryInteractor(this)
+        searchSongsInteractor = Creator.createSearchSongsInteractor()
 
         val onTrackClickListener = { track: Track ->
-            searchHistory.addTrackToHistory(track)
+            searchHistoryInteractor.addTrack(track)
             val intent = Intent(this, PlayerActivity::class.java)
             intent.putExtra("track", track)
             startActivity(intent)
             updateHistoryView()
         }
-
 
         binding.rvListOfTracks.layoutManager = LinearLayoutManager(this)
         binding.rvListOfTracks.adapter = TrackAdapter(emptyList(), onTrackClickListener)
@@ -51,7 +48,7 @@ class SearchActivity : BaseActivity() {
         binding.rvHistoryList.adapter = TrackAdapter(emptyList(), onTrackClickListener)
 
         binding.clearHistoryButton.setOnClickListener {
-            searchHistory.clearHistory()
+            searchHistoryInteractor.clearHistory()
             updateHistoryView()
             binding.searchEditText.setText("")
             binding.searchEditText.requestFocus()
@@ -61,16 +58,9 @@ class SearchActivity : BaseActivity() {
         binding.retrySearch.setOnClickListener {
             val query = binding.searchEditText.text.toString()
             if (query.isNotEmpty()) {
-                searchSongs(query)
+                performSearch(query)
             }
         }
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(itunesBaseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        itunesService = retrofit.create(ItunesService::class.java)
 
         binding.searchScreenToolbar.setOnClickListener {
             finish()
@@ -78,13 +68,21 @@ class SearchActivity : BaseActivity() {
 
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
                 with(binding) {
                     clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
                     historyLayout.visibility = if (s.isNullOrEmpty()) View.VISIBLE else View.GONE
-
+                    if (s.isNullOrEmpty()) {
+                        clearIcon.visibility = View.GONE
+                        historyLayout.visibility = View.VISIBLE
+                        makePhsInvisible()
+                    } else {
+                        clearIcon.visibility = View.VISIBLE
+                        historyLayout.visibility = View.GONE
+                    }
                     searchRunnable?.let { handler.removeCallbacks(it) }
 
                     if (s.isNullOrEmpty()) {
@@ -95,7 +93,7 @@ class SearchActivity : BaseActivity() {
                             val query = s.toString()
                             if (query.isNotEmpty()) {
                                 showProgressBar()
-                                searchSongs(query)
+                                performSearch(query)
                             }
                         }
                         handler.postDelayed(searchRunnable!!, 2000)
@@ -112,46 +110,41 @@ class SearchActivity : BaseActivity() {
             binding.rvListOfTracks.visibility = View.GONE
             updateHistoryView()
             binding.searchEditText.clearFocus()
+            makePhsInvisible()
         }
     }
 
     private fun updateHistoryView() {
-        val history = searchHistory.getHistory()
+        val history = searchHistoryInteractor.getHistory()
         binding.historyLayout.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
         (binding.rvHistoryList.adapter as TrackAdapter).updateData(history)
     }
 
-    private fun searchSongs(query: String) {
+    private fun makePhsInvisible() {
+        binding.nothingFoundPlaceholder.visibility = View.GONE
+        binding.noConnectionPlaceholder.visibility = View.GONE
+    }
+
+    private fun performSearch(query: String) {
         if (!isNetworkAvailable()) {
             binding.progressBar.visibility = View.GONE
             showNoConnectionPlaceholder()
             return
         }
-
-        itunesService.searchSongs(query).enqueue(object : Callback<ItunesResponse> {
-            override fun onResponse(
-                call: Call<ItunesResponse>,
-                response: Response<ItunesResponse>
-            ) {
+        searchSongsInteractor.execute(query) { result ->
+            runOnUiThread {
                 binding.progressBar.visibility = View.GONE
-
-                if (response.isSuccessful) {
-                    val songs = response.body()?.results
-                    if (!songs.isNullOrEmpty()) {
+                result.onSuccess { songs ->
+                    if (songs.isNotEmpty()) {
                         showRecyclerView(songs)
                     } else {
                         showNothingFoundPlaceholder()
                     }
-                } else {
+                }.onFailure {
                     showNoConnectionPlaceholder()
                 }
             }
-
-            override fun onFailure(call: Call<ItunesResponse>, t: Throwable) {
-                binding.progressBar.visibility = View.GONE
-                showNoConnectionPlaceholder()
-            }
-        })
+        }
     }
 
     private fun showProgressBar() {
@@ -165,22 +158,7 @@ class SearchActivity : BaseActivity() {
         rvListOfTracks.visibility = View.VISIBLE
         noConnectionPlaceholder.visibility = View.GONE
         nothingFoundPlaceholder.visibility = View.GONE
-
-        val tracks = songs.map {
-            Track(
-                trackName = it.trackName,
-                artistName = it.artistName,
-                trackTimeMillis = it.getFormattedTrackTime(),
-                artworkUrl100 = it.artworkUrl100,
-                collectionName = it.collectionName ?: "",
-                releaseDate = it.releaseDate,
-                primaryGenreName = it.primaryGenreName,
-                country = it.country,
-                previewUrl = it.previewUrl
-            )
-        }
-
-        (rvListOfTracks.adapter as TrackAdapter).updateData(tracks)
+        (rvListOfTracks.adapter as TrackAdapter).updateData(songs)
     }
 
     private fun showNoConnectionPlaceholder() {
@@ -212,6 +190,7 @@ class SearchActivity : BaseActivity() {
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
