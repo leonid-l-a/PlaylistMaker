@@ -3,45 +3,47 @@ package com.example.playlistmaker.ui
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
+import androidx.lifecycle.Observer
 import com.example.playlistmaker.databinding.ActivityMainBinding
-import com.example.playlistmaker.domain.interactor.SettingsInteractor
-import com.example.playlistmaker.domain.use_case.impl.main.SetCurrentModeUseCase
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.presentation.main.MainViewModel
+import com.example.playlistmaker.presentation.main.NavigationEvent
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var settingsInteractor: SettingsInteractor
-    private lateinit var setCurrentModeUseCase: SetCurrentModeUseCase
+    private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+
+
+    private val viewModel: MainViewModel by lazy {
+        Creator.provideMainViewModel()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        settingsInteractor = Creator.provideSettingsInteractor()
 
-        val isDarkMode = settingsInteractor.getSettings().isDarkModeEnabled
-
-        setCurrentModeUseCase = Creator.provideSetCurrentModeUseCase()
-        setCurrentModeUseCase.setCurrentMode(isDarkMode)
-
+        viewModel.navigationEvent.observe(this, Observer { event ->
+            when (event) {
+                is NavigationEvent.ToSearchActivity -> {
+                    startActivity(Intent(this, SearchActivity::class.java))
+                }
+                is NavigationEvent.ToLibraryActivity -> {
+                    startActivity(Intent(this, LibraryActivity::class.java))
+                }
+                is NavigationEvent.ToSettingsActivity -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                }
+            }
+        })
 
         binding.buttonSearchActivity.setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
+            viewModel.onSearchButtonClicked()
         }
-
         binding.buttonLibraryActivity.setOnClickListener {
-            startActivity(Intent(this, LibraryActivity::class.java))
+            viewModel.onLibraryButtonClicked()
         }
-
         binding.buttonSettingsActivity.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+            viewModel.onSettingsButtonClicked()
         }
-
-        val color = ContextCompat.getColor(this, R.color.main_activity_background_tint)
-
-        window.statusBarColor = color
     }
 }

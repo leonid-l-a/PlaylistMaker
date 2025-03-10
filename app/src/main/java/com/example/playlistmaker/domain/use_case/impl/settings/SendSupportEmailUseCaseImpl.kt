@@ -2,13 +2,13 @@ package com.example.playlistmaker.domain.use_case.impl.settings
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import com.example.playlistmaker.R
+import androidx.core.net.toUri
 
 class SendSupportEmailUseCaseImpl(private val context: Context) : SendSupportEmailUseCase {
     override fun sendSupportEmail() {
         val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+            data = "mailto:".toUri()
             putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.support_email)))
             putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.support_subject))
             putExtra(Intent.EXTRA_TEXT, context.getString(R.string.support_text))

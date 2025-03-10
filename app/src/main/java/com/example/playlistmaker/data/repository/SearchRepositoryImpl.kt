@@ -9,7 +9,7 @@ import com.example.playlistmaker.domain.repository.SearchRepository
 class SearchRepositoryImpl() : SearchRepository {
     private val networkClient = RetrofitNetworkClient()
 
-    override fun searchSongs(query: String, callback: (Result<List<Track>>) -> Unit) {
+    override fun searchTracks(query: String, callback: (Result<List<Track>>) -> Unit) {
         kotlin.concurrent.thread {
             val requestDto = ItunesRequest(query)
             try {

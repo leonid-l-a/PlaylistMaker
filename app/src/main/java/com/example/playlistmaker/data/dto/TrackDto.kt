@@ -13,7 +13,6 @@ data class TrackDto(
     val trackName: String,
     @SerializedName("artistName")
     val artistName: String,
-    // Изменили тип на Long
     @SerializedName("trackTimeMillis")
     val trackTimeMillis: Long,
     @SerializedName("artworkUrl100")
