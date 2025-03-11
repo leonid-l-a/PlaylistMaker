@@ -5,12 +5,11 @@ import com.example.playlistmaker.data.dto.ItunesRequest
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.domain.repository.SearchRepository
+import kotlin.concurrent.thread
 
-class SearchRepositoryImpl() : SearchRepository {
-    private val networkClient = RetrofitNetworkClient()
-
+class SearchRepositoryImpl(private val networkClient: RetrofitNetworkClient) : SearchRepository {
     override fun searchTracks(query: String, callback: (Result<List<Track>>) -> Unit) {
-        kotlin.concurrent.thread {
+        thread {
             val requestDto = ItunesRequest(query)
             try {
                 val response = networkClient.doRequest(requestDto)

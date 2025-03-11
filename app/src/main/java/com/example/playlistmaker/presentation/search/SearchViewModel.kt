@@ -40,7 +40,9 @@ class SearchViewModel(
 
     fun addToHistory(track: Track) {
         searchHistory.addTrack(track)
-        loadHistory()
+        if (lastQuery.isNullOrEmpty()) {
+            loadHistory()
+        }
     }
 
     fun searchTracks(query: String) {

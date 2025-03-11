@@ -1,22 +1,24 @@
 package com.example.playlistmaker.presentation.main
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.domain.interactor.SettingsInteractor
-import com.example.playlistmaker.domain.use_case.impl.main.SetCurrentModeUseCase
+import com.example.playlistmaker.domain.use_case.settings.inter.GetDarkModeUseCase
 
 class MainViewModel(
-    settingsInteractor: SettingsInteractor,
-    setCurrentModeUseCase: SetCurrentModeUseCase
+    getDarkModeUseCase: GetDarkModeUseCase
 ) : ViewModel() {
 
     private val _navigationEvent = MutableLiveData<NavigationEvent>()
     val navigationEvent: LiveData<NavigationEvent> get() = _navigationEvent
 
     init {
-        val isDarkMode = settingsInteractor.getSettings().isDarkModeEnabled
-        setCurrentModeUseCase.setCurrentMode(isDarkMode)
+        val isDarkMode = getDarkModeUseCase.execute()
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
     }
 
     fun onSearchButtonClicked() {
@@ -30,6 +32,4 @@ class MainViewModel(
     fun onSettingsButtonClicked() {
         _navigationEvent.value = NavigationEvent.ToSettingsActivity
     }
-
-
 }
