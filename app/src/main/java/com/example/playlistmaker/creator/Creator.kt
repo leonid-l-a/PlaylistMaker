@@ -7,8 +7,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.savedstate.SavedStateRegistryOwner
+import com.example.playlistmaker.data.SystemThemeProviderImpl
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.data.repository.*
+import com.example.playlistmaker.domain.SystemThemeProvider
 import com.example.playlistmaker.domain.impl.*
 import com.example.playlistmaker.domain.interactor.*
 import com.example.playlistmaker.domain.repository.*
@@ -64,7 +66,9 @@ object Creator {
     }
 
     fun provideGetDarkModeUseCase(): GetDarkModeUseCase {
-        return GetDarkModeUseCaseImpl(provideSettingsRepository())
+        val settingsRepository = provideSettingsRepository()
+        val systemThemeProvider: SystemThemeProvider = SystemThemeProviderImpl(appContext)
+        return GetDarkModeUseCaseImpl(settingsRepository, systemThemeProvider)
     }
 
     fun provideSetDarkModeUseCase(): SetDarkModeUseCase {
