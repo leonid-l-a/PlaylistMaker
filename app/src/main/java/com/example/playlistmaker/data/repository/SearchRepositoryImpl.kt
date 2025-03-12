@@ -16,12 +16,8 @@ class SearchRepositoryImpl(private val networkClient: RetrofitNetworkClient) : S
                 if (response.resultCode == 200) {
                     val itunesResponse = response as? ItunesNetworkResponse
                     val trackDto = itunesResponse?.results ?: emptyList()
-                    if (trackDto.isNotEmpty()) {
-                        val domainTracks = trackDto.map { it.toDomain() }
-                        callback(Result.success(domainTracks))
-                    } else {
-                        callback(Result.failure(Throwable("No songs found")))
-                    }
+                    val domainTracks = trackDto.map { it.toDomain() }
+                    callback(Result.success(domainTracks))
                 } else {
                     callback(Result.failure(Throwable("Error code: ${response.resultCode}")))
                 }
