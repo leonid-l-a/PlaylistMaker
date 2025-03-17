@@ -2,21 +2,20 @@ package com.example.playlistmaker.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.playlistmaker.databinding.ActivityMainBinding
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.presentation.BaseActivity
 import com.example.playlistmaker.presentation.main.MainViewModel
 import com.example.playlistmaker.presentation.main.NavigationEvent
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
 
-    private val viewModel: MainViewModel by lazy {
-        Creator.provideMainViewModel()
-    }
+    private val viewModel: MainViewModel by viewModel()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
