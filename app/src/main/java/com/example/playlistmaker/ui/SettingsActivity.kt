@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.presentation.BaseActivity
 import com.example.playlistmaker.presentation.settings.SettingsViewModel
@@ -19,9 +18,6 @@ class SettingsActivity : BaseActivity() {
 
         viewModel.isDarkModeEnabled.observe(this) { isDarkModeEnabled ->
             binding.switchDarkMode.isChecked = isDarkModeEnabled
-            AppCompatDelegate.setDefaultNightMode(
-                if (isDarkModeEnabled) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            )
         }
 
         binding.settingsScreenToolbar.setOnClickListener { finish() }
