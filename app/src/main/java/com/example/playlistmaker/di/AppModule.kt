@@ -2,6 +2,7 @@ package com.example.playlistmaker.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.MediaPlayer
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.data.repository.PlayerRepositoryImpl
 import com.example.playlistmaker.data.repository.SearchRepositoryImpl
@@ -40,12 +41,15 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 val appModule = module {
-    single<PlayerRepository> { PlayerRepositoryImpl() }
-    single<PlayerInteractor> { PlayerInteractorImpl(get()) }
+    factory <PlayerInteractor> { PlayerInteractorImpl(get()) }
+    single<PlayerRepository> { PlayerRepositoryImpl { get<MediaPlayer>() } }
+    factory { MediaPlayer() }
     viewModel { (track: Track) -> PlayerViewModel(get(), track) }
-    single { RetrofitNetworkClient() }
+    single { RetrofitNetworkClient(get()) }
     single<SearchRepository> { SearchRepositoryImpl(get()) }
     single<SharedPreferences>(named("settingsPrefs")) {
         androidContext().getSharedPreferences("APP_PREFERENCES", Context.MODE_PRIVATE)
@@ -75,4 +79,11 @@ val appModule = module {
         )
     }
     viewModel { MainViewModel(get()) }
+
+    single <Retrofit> {
+        Retrofit.Builder()
+            .baseUrl("https://itunes.apple.com")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 }
