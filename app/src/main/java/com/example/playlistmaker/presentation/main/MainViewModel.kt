@@ -15,10 +15,10 @@ class MainViewModel(
 
     init {
         val isDarkMode = getDarkModeUseCase.execute()
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
-            else AppCompatDelegate.MODE_NIGHT_NO
-        )
+        val newMode = if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        if (AppCompatDelegate.getDefaultNightMode() != newMode) {
+            AppCompatDelegate.setDefaultNightMode(newMode)
+        }
     }
 
     fun onSearchButtonClicked() {
