@@ -40,7 +40,7 @@ class PlayerRepositoryImpl(
     }
 
     override fun isPlaying(): Boolean {
-        return mediaPlayer?.isPlaying ?: false
+        return mediaPlayer?.isPlaying == true
     }
 
     override fun getCurrentPosition(): Int {

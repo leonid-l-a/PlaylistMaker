@@ -18,15 +18,15 @@ import org.koin.core.parameter.parametersOf
 
 class PlayerActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityPlayerBinding
-    @Suppress("DEPRECATION")
+    private val binding: ActivityPlayerBinding by lazy { ActivityPlayerBinding.inflate(layoutInflater) }
+
     private val viewModel: PlayerViewModel by viewModel {
+        @Suppress("DEPRECATION")
         parametersOf(intent.getParcelableExtra<Track>("track")!!)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupObservers()

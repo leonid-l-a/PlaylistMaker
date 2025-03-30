@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".App"
@@ -24,10 +24,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.SettingsActivity" />
-        <activity android:name=".ui.LibraryActivity" />
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:launchMode="singleTop" />
+
+        <activity android:name=".ui.library.LibraryActivity" />
         <activity android:name=".ui.SearchActivity" />
-        <activity android:name=".ui.PlayerActivity"/>
+        <activity android:name=".ui.PlayerActivity" />
     </application>
 
 

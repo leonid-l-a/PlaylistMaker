@@ -88,4 +88,5 @@
         <item name="layout_constraintStart_toEndOf">@id/textsBarrier</item>
         <item name="android:ellipsize">end</item>
     </style>
+
 </resources>
