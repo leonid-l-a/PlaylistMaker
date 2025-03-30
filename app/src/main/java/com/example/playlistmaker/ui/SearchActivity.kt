@@ -10,39 +10,26 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.entitie.Track
-import com.example.playlistmaker.presentation.BaseActivity
 import com.example.playlistmaker.presentation.search.SearchState
 import com.example.playlistmaker.presentation.search.SearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : BaseActivity() {
+class SearchActivity : AppCompatActivity() {
 
-    private val binding: ActivitySearchBinding by lazy {
-        ActivitySearchBinding.inflate(layoutInflater)
-    }
-    private val viewModel: SearchViewModel by viewModels {
-        Creator.provideSearchViewModelFactory(
-            this,
-            this
-        )
-    }
+    private val binding: ActivitySearchBinding by lazy { ActivitySearchBinding.inflate(layoutInflater) }
+    private val viewModel: SearchViewModel by viewModel()
     private val handler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
-    private val searchAdapter: TrackAdapter by lazy {
-        TrackAdapter(emptyList()) { track -> openPlayer(track) }
-    }
-    private val historyAdapter: TrackAdapter by lazy {
-        TrackAdapter(emptyList()) { track -> openPlayer(track) }
-    }
+    private val searchAdapter: TrackAdapter by lazy { TrackAdapter(emptyList()) { track -> openPlayer(track) } }
+    private val historyAdapter: TrackAdapter by lazy { TrackAdapter(emptyList()) { track -> openPlayer(track) } }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
         setupRecyclerViews()
         setupObservers()
         setupClickListeners()
@@ -70,7 +57,6 @@ class SearchActivity : BaseActivity() {
                 layoutManager = LinearLayoutManager(this@SearchActivity)
                 adapter = searchAdapter
             }
-
             rvHistoryList.apply {
                 layoutManager = LinearLayoutManager(this@SearchActivity)
                 adapter = historyAdapter
@@ -119,7 +105,6 @@ class SearchActivity : BaseActivity() {
         with(binding) {
             clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
-
         searchRunnable?.let { handler.removeCallbacks(it) }
         searchRunnable = Runnable {
             val query = s?.toString().orEmpty()
@@ -134,7 +119,6 @@ class SearchActivity : BaseActivity() {
 
     private fun performSearch(query: String) {
         if (query.isEmpty()) return
-
         if (isNetworkAvailable()) {
             viewModel.searchTracks(query)
         } else {
@@ -150,7 +134,6 @@ class SearchActivity : BaseActivity() {
             noConnectionPlaceholder.visibility = if (state is SearchState.Error) View.VISIBLE else View.GONE
             historyLayout.visibility = if (state is SearchState.History && state.tracks.isNotEmpty()) View.VISIBLE else View.GONE
         }
-
         when (state) {
             is SearchState.Success -> searchAdapter.updateData(state.tracks)
             is SearchState.History -> {
@@ -163,7 +146,7 @@ class SearchActivity : BaseActivity() {
 
     private fun openPlayer(track: Track) {
         viewModel.addToHistory(track)
-        startActivity(Intent(this, PlayerActivity::class.java).apply {  
+        startActivity(Intent(this, PlayerActivity::class.java).apply {
             putExtra("track", track)
         })
     }

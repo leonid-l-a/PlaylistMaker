@@ -3,32 +3,25 @@ package com.example.playlistmaker.ui
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.domain.entitie.Track
+import com.example.playlistmaker.presentation.BaseActivity
 import com.example.playlistmaker.presentation.player.PlayerState
 import com.example.playlistmaker.presentation.player.PlayerViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
-@Suppress("UNCHECKED_CAST")
-class PlayerActivity : AppCompatActivity() {
+class PlayerActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
-    private val viewModel: PlayerViewModel by viewModels {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("DEPRECATION") val track = intent.getParcelableExtra<Track>("track")!!
-                return PlayerViewModel(Creator.providePlayerInteractor(), track) as T
-            }
-        }
+    @Suppress("DEPRECATION")
+    private val viewModel: PlayerViewModel by viewModel {
+        parametersOf(intent.getParcelableExtra<Track>("track")!!)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +57,6 @@ class PlayerActivity : AppCompatActivity() {
                 trackGenre.text = trackData.genre
                 trackCountry.text = trackData.country
 
-
                 Glide.with(this@PlayerActivity)
                     .load(trackData.artworkUrl ?: R.drawable.ph_no_track_image)
                     .placeholder(R.drawable.ph_no_track_image)
@@ -81,26 +73,21 @@ class PlayerActivity : AppCompatActivity() {
                     binding.ibPlay.isEnabled = false
                     binding.timePlayed.text = getString(R.string.time_start)
                 }
-
                 is PlayerState.Ready -> {
                     binding.ibPlay.isEnabled = true
                 }
-
                 is PlayerState.Playing -> {
                     binding.timePlayed.text =
                         SimpleDateFormat("mm:ss", Locale.getDefault()).format(state.remainingMillis)
                     binding.ibPlay.setImageResource(R.drawable.ic_pause)
                 }
-
                 is PlayerState.Paused -> {
                     binding.ibPlay.setImageResource(R.drawable.ic_play)
                 }
-
                 is PlayerState.Completed -> {
                     binding.timePlayed.text = getString(R.string.time_zero)
                     binding.ibPlay.setImageResource(R.drawable.ic_play)
                 }
-
                 is PlayerState.Error -> {
                     finish()
                     Toast.makeText(this, "Unexpected error", Toast.LENGTH_LONG).show()

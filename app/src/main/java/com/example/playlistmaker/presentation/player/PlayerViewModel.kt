@@ -88,7 +88,7 @@ class PlayerViewModel(
         handler.removeCallbacks(updateTimeRunnable)
     }
 
-    private fun releasePlayer() {
+    fun releasePlayer() {
         playerInteractor.release()
         handler.removeCallbacks(updateTimeRunnable)
     }
