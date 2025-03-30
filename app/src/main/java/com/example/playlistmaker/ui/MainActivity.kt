@@ -7,6 +7,7 @@ import com.example.playlistmaker.databinding.ActivityMainBinding
 import com.example.playlistmaker.presentation.BaseActivity
 import com.example.playlistmaker.presentation.main.MainViewModel
 import com.example.playlistmaker.presentation.main.NavigationEvent
+import com.example.playlistmaker.ui.library.LibraryActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseActivity() {

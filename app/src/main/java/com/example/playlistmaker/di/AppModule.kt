@@ -37,6 +37,8 @@ import com.example.playlistmaker.presentation.main.MainViewModel
 import com.example.playlistmaker.presentation.player.PlayerViewModel
 import com.example.playlistmaker.presentation.search.SearchViewModel
 import com.example.playlistmaker.presentation.settings.SettingsViewModel
+import com.example.playlistmaker.presentation.settings.library.FavoritesViewModel
+import com.example.playlistmaker.presentation.settings.library.PlaylistsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -45,6 +47,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 val appModule = module {
+    viewModel { FavoritesViewModel() }
+    viewModel { PlaylistsViewModel() }
     factory <PlayerInteractor> { PlayerInteractorImpl(get()) }
     single<PlayerRepository> { PlayerRepositoryImpl { get<MediaPlayer>() } }
     factory { MediaPlayer() }

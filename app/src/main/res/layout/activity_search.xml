@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -41,7 +42,8 @@
             android:textColorHint="@color/search_line_hint_color"
             android:textCursorDrawable="@drawable/cursor"
             android:textFontWeight="400"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="RtlSymmetry" />
 
         <ImageView
             android:id="@+id/clearIcon"
@@ -81,7 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/retrySearch"
-            style="@style/search_screen_button_retry_research_style"/>
+            style="@style/common_button_style"/>
     </LinearLayout>
 
     <LinearLayout
@@ -151,7 +153,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/clear_history"
                     android:layout_gravity="center_horizontal"
-                    style="@style/search_screen_button_retry_research_style"
+                    style="@style/common_button_style"
                     android:layout_marginBottom="8dp"/>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
