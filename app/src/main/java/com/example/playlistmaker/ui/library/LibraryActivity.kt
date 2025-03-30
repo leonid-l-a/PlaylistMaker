@@ -11,8 +11,12 @@ class LibraryActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLibraryBinding
 
-    private val tabTitles = arrayOf("Избранные треки", "Плейлисты" )
-
+    private val tabTitles by lazy {
+        arrayOf(
+            binding.root.context.getString(R.string.tab_favorites),
+            binding.root.context.getString(R.string.tab_playlists)
+        )
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLibraryBinding.inflate(layoutInflater)

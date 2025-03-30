@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:layout_gravity="center_horizontal"
-        style="@style/search_screen_button_retry_research_style"
+        style="@style/common_button_style"
         android:text = "@string/new_playlist"
         android:textSize="14sp"
         android:textFontWeight="500"

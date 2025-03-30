@@ -18,7 +18,7 @@ import org.koin.core.parameter.parametersOf
 
 class PlayerActivity : BaseActivity() {
 
-    private val binding: ActivityPlayerBinding by lazy { ActivityPlayerBinding.inflate(layoutInflater) }
+    private val binding: ActivityPlayerBinding by lazy(LazyThreadSafetyMode.NONE) { ActivityPlayerBinding.inflate(layoutInflater)}
 
     private val viewModel: PlayerViewModel by viewModel {
         @Suppress("DEPRECATION")

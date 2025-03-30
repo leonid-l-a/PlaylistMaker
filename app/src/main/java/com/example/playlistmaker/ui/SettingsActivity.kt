@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui
 
 import android.os.Bundle
-import android.util.Log
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.presentation.BaseActivity
 import com.example.playlistmaker.presentation.settings.SettingsViewModel
@@ -16,8 +15,6 @@ class SettingsActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        Log.d("ONCREATEACTIVITY", "ISCALLED")
 
         viewModel.isDarkModeEnabled.observe(this) { isDarkModeEnabled ->
             binding.switchDarkMode.isChecked = isDarkModeEnabled

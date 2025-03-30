@@ -62,7 +62,7 @@
         <item name="android:layout_width">wrap_content</item>
     </style>
 
-    <style name="search_screen_button_retry_research_style">
+    <style name="common_button_style">
         <item name="backgroundTint">@color/common_text_color</item>
         <item name="cornerRadius">54dp</item>
     </style>
