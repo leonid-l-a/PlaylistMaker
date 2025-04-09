@@ -9,7 +9,7 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/settingsScreenToolbar"
-        style="@style/toolbar_style"
+        style="@style/header_style"
         app:title="@string/settings" />
 
     <androidx.appcompat.widget.SwitchCompat

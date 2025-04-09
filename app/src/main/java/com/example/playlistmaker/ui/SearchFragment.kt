@@ -1,5 +1,6 @@
 package com.example.playlistmaker.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -8,37 +9,46 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.presentation.search.SearchState
 import com.example.playlistmaker.presentation.search.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment: Fragment() {
+    companion object {
+        private const val SEARCH_DELAY_MS = 2000L
+    }
 
-    private val binding: ActivitySearchBinding by lazy { ActivitySearchBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentSearchBinding
     private val viewModel: SearchViewModel by viewModel()
-    private val handler = Handler(Looper.getMainLooper())
-    private var searchRunnable: Runnable? = null
     private val searchAdapter: TrackAdapter by lazy { TrackAdapter(emptyList()) { track -> openPlayer(track) } }
     private val historyAdapter: TrackAdapter by lazy { TrackAdapter(emptyList()) { track -> openPlayer(track) } }
+    private var searchRunnable: Runnable? = null
+    private val handler = Handler(Looper.getMainLooper())
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         setupRecyclerViews()
         setupObservers()
         setupClickListeners()
         restoreState(savedInstanceState)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("searchQuery", binding.searchEditText.text.toString())
     }
 
     override fun onResume() {
@@ -46,26 +56,34 @@ class SearchActivity : AppCompatActivity() {
         updateUIState()
     }
 
-    override fun onDestroy() {
-        handler.removeCallbacksAndMessages(null)
-        super.onDestroy()
-    }
-
     private fun setupRecyclerViews() {
         with(binding) {
             rvListOfTracks.apply {
-                layoutManager = LinearLayoutManager(this@SearchActivity)
+                layoutManager = LinearLayoutManager(requireContext())
                 adapter = searchAdapter
             }
             rvHistoryList.apply {
-                layoutManager = LinearLayoutManager(this@SearchActivity)
+                layoutManager = LinearLayoutManager(requireContext())
                 adapter = historyAdapter
             }
         }
     }
 
+    private fun openPlayer(track: Track) {
+        viewModel.addToHistory(track)
+        startActivity(Intent(requireContext(), PlayerActivity::class.java).apply {
+            putExtra("track", track)
+        })
+    }
+
+    private fun hideKeyboard() {
+        (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+            binding.searchEditText.windowToken, 0
+        )
+    }
+
     private fun setupObservers() {
-        viewModel.searchState.observe(this) { state ->
+        viewModel.searchState.observe(viewLifecycleOwner) { state ->
             updateUI(state)
         }
     }
@@ -76,8 +94,16 @@ class SearchActivity : AppCompatActivity() {
             clearIcon.setOnClickListener { clearSearch() }
             clearHistoryButton.setOnClickListener { viewModel.clearHistory() }
             retrySearch.setOnClickListener { retrySearch() }
-            searchScreenToolbar.setNavigationOnClickListener { finish() }
         }
+    }
+
+    private fun retrySearch() {
+        binding.searchEditText.text?.toString()?.takeUnless { it.isEmpty() }?.let(::performSearch)
+    }
+    private fun clearSearch() {
+        binding.searchEditText.setText("")
+        hideKeyboard()
+        viewModel.loadHistory()
     }
 
     private fun restoreState(savedInstanceState: Bundle?) {
@@ -144,23 +170,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun openPlayer(track: Track) {
-        viewModel.addToHistory(track)
-        startActivity(Intent(this, PlayerActivity::class.java).apply {
-            putExtra("track", track)
-        })
-    }
-
-    private fun clearSearch() {
-        binding.searchEditText.setText("")
-        hideKeyboard()
-        viewModel.loadHistory()
-    }
-
-    private fun retrySearch() {
-        binding.searchEditText.text?.toString()?.takeUnless { it.isEmpty() }?.let(::performSearch)
-    }
-
     private fun showErrorState() {
         binding.apply {
             progressBar.visibility = View.GONE
@@ -169,20 +178,12 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun hideKeyboard() {
-        (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-            binding.searchEditText.windowToken, 0
-        )
-    }
 
     private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    companion object {
-        private const val SEARCH_DELAY_MS = 2000L
-    }
 }

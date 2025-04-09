@@ -5,9 +5,10 @@ import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.domain.repository.SearchHistoryRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import androidx.core.content.edit
 
 class SearchHistoryRepositoryImpl(
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
 ) : SearchHistoryRepository {
 
     private val historyKey = "search_history"
@@ -35,11 +36,11 @@ class SearchHistoryRepositoryImpl(
     }
 
     override fun clearHistory() {
-        sharedPreferences.edit().remove(historyKey).apply()
+        sharedPreferences.edit { remove(historyKey) }
     }
 
     private fun saveHistory(history: List<Track>) {
         val historyJson = gson.toJson(history)
-        sharedPreferences.edit().putString(historyKey, historyJson).apply()
+        sharedPreferences.edit { putString(historyKey, historyJson) }
     }
 }
