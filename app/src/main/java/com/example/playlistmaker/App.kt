@@ -1,7 +1,7 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import com.example.playlistmaker.di.appModule
+import com.example.playlistmaker.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -10,7 +10,14 @@ class App : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@App)
-            modules(appModule)
+            modules(
+                networkModule,
+                playerModule,
+                settingsModule,
+                searchModule,
+                libraryModule,
+                mainModule
+            )
         }
     }
 }

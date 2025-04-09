@@ -10,7 +10,7 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/searchScreenToolbar"
-        style="@style/toolbar_style"
+        style="@style/header_style"
         app:title="@string/search" />
 
     <LinearLayout

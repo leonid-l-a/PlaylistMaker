@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.databinding.FragmentFavoritesBinding
-import com.example.playlistmaker.presentation.settings.library.FavoritesViewModel
+import com.example.playlistmaker.presentation.library.FavoritesViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FavoritesFragment : Fragment() {
