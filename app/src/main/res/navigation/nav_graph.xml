@@ -10,9 +10,21 @@
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.playlistmaker.ui.SearchFragment"
-        android:label="SearchFragment" />
+        android:label="SearchFragment">
+        <action
+            android:id="@+id/action_searchFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.playlistmaker.ui.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/playerFragment"
+        android:name="com.example.playlistmaker.ui.PlayerFragment"
+        android:label="PlayerFragment">
+        <argument
+            android:name="trackData"
+            app:argType="com.example.playlistmaker.domain.entitie.Track"/>
+    </fragment>
 </navigation>

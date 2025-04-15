@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui
 
 import android.content.Context
-import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
@@ -14,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.entitie.Track
@@ -71,9 +71,9 @@ class SearchFragment: Fragment() {
 
     private fun openPlayer(track: Track) {
         viewModel.addToHistory(track)
-        startActivity(Intent(requireContext(), PlayerActivity::class.java).apply {
-            putExtra("track", track)
-        })
+
+        val action = SearchFragmentDirections.actionSearchFragmentToPlayerFragment(trackData = track)
+        findNavController().navigate(action)
     }
 
     private fun hideKeyboard() {
