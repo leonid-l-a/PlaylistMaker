@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -16,6 +19,7 @@ import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.presentation.player.PlayerState
 import com.example.playlistmaker.presentation.player.PlayerViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
@@ -45,11 +49,13 @@ class PlayerFragment : Fragment() {
         setupObservers()
         hideBottomNavView()
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                handleBackPressed()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    handleBackPressed()
+                }
+            })
     }
 
     override fun onPause() {
@@ -63,66 +69,84 @@ class PlayerFragment : Fragment() {
     }
 
     private fun setupUi() {
-        binding.searchScreenToolbar.setNavigationOnClickListener { handleBackPressed()}
+        binding.searchScreenToolbar.setNavigationOnClickListener { handleBackPressed() }
         binding.ibPlay.setOnClickListener { viewModel.playbackControl() }
 
-        viewModel.trackData.observe(viewLifecycleOwner) { trackData ->
-            with(binding) {
-                tvTrackName.text = trackData.trackName
-                tvArtistName.text = trackData.artistName
-                trackDurability.text = trackData.duration
+        lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.trackData.collect { trackData ->
+                    trackData?.let { data ->
+                        with(binding) {
+                            tvTrackName.text = data.trackName
+                            tvArtistName.text = data.artistName
+                            trackDurability.text = data.duration
 
-                trackAlbumNameText.visibility =
-                    if (trackData.collectionName.isNullOrEmpty()) View.GONE else View.VISIBLE
-                trackAlbumName.visibility = trackAlbumNameText.visibility
-                trackAlbumName.text = trackData.collectionName
+                            trackAlbumNameText.visibility =
+                                if (data.collectionName.isNullOrEmpty()) View.GONE else View.VISIBLE
+                            trackAlbumName.visibility = trackAlbumNameText.visibility
+                            trackAlbumName.text = data.collectionName
 
-                trackYear.text = trackData.year
-                trackGenre.text = trackData.genre
-                trackCountry.text = trackData.country
+                            trackYear.text = data.year
+                            trackGenre.text = data.genre
+                            trackCountry.text = data.country
 
-                Glide.with(requireContext())
-                    .load(trackData.artworkUrl ?: R.drawable.ph_no_track_image)
-                    .placeholder(R.drawable.ph_no_track_image)
-                    .transform(RoundedCorners(8))
-                    .into(trackImage)
+                            Glide.with(requireContext())
+                                .load(data.artworkUrl ?: R.drawable.ph_no_track_image)
+                                .placeholder(R.drawable.ph_no_track_image)
+                                .transform(RoundedCorners(8))
+                                .into(trackImage)
+                        }
+                    }
+                }
+
             }
         }
+
     }
 
     private fun setupObservers() {
-        viewModel.playerState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is PlayerState.Preparing -> {
-                    binding.ibPlay.isEnabled = false
-                    binding.timePlayed.text = getString(R.string.time_start)
-                }
+        lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.playerState.collect { state ->
+                    when (state) {
+                        is PlayerState.Preparing -> {
+                            binding.ibPlay.isEnabled = false
+                            binding.timePlayed.text = getString(R.string.time_start)
+                        }
 
-                is PlayerState.Ready -> {
-                    binding.ibPlay.isEnabled = true
-                }
+                        is PlayerState.Ready -> {
+                            binding.ibPlay.isEnabled = true
+                        }
 
-                is PlayerState.Playing -> {
-                    binding.timePlayed.text =
-                        SimpleDateFormat("mm:ss", Locale.getDefault()).format(state.remainingMillis)
-                    binding.ibPlay.setImageResource(R.drawable.ic_pause)
-                }
+                        is PlayerState.Playing -> {
+                            binding.timePlayed.text = SimpleDateFormat(
+                                "mm:ss",
+                                Locale.getDefault()
+                            ).format(state.remainingMillis)
+                            binding.ibPlay.setImageResource(R.drawable.ic_pause)
+                        }
 
-                is PlayerState.Paused -> {
-                    binding.ibPlay.setImageResource(R.drawable.ic_play)
-                }
+                        is PlayerState.Paused -> {
+                            binding.ibPlay.setImageResource(R.drawable.ic_play)
+                        }
 
-                is PlayerState.Completed -> {
-                    binding.timePlayed.text = getString(R.string.time_zero)
-                    binding.ibPlay.setImageResource(R.drawable.ic_play)
-                }
+                        is PlayerState.Completed -> {
+                            binding.timePlayed.text = getString(R.string.time_zero)
+                            binding.ibPlay.setImageResource(R.drawable.ic_play)
+                        }
 
-                is PlayerState.Error -> {
-                    findNavController().popBackStack()
-                    Toast.makeText(requireContext(), "Unexpected error", Toast.LENGTH_LONG).show()
+                        is PlayerState.Error -> {
+                            findNavController().popBackStack()
+                            Toast.makeText(requireContext(), "Unexpected error", Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
                 }
             }
         }
+
     }
 
     private fun hideBottomNavView() {
@@ -133,7 +157,8 @@ class PlayerFragment : Fragment() {
     }
 
     private fun handleBackPressed() {
-        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        val bottomNav =
+            requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNav.visibility = View.VISIBLE
         val divider = requireActivity().findViewById<View>(R.id.divider)
         divider.visibility = View.VISIBLE
