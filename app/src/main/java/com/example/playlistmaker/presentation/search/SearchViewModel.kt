@@ -1,21 +1,29 @@
 package com.example.playlistmaker.presentation.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.domain.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchHistory: SearchHistoryInteractor,
     private val searchTracks: SearchTracksInteractor,
-    private val savedState: SavedStateHandle
+    private val savedState: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _searchState = MutableLiveData<SearchState>()
-    val searchState: LiveData<SearchState> = _searchState
+    private val _searchState = MutableStateFlow<SearchState>(SearchState.Empty)
+    val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
+
+    private var searchJob: Job? = null
 
     private var lastQuery: String?
         get() = savedState["lastQuery"]
@@ -25,12 +33,62 @@ class SearchViewModel(
         get() = savedState["lastResults"]
         set(value) { savedState["lastResults"] = value }
 
+    private val queryFlow = MutableStateFlow("")
+
+    init {
+        observeQuery()
+    }
+
+    fun onQueryChanged(query: String) {
+        queryFlow.value = query
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observeQuery() {
+        viewModelScope.launch {
+            queryFlow
+                .debounce(2000L)
+                .collect { query ->
+                    if (query.isEmpty()) {
+                        loadHistory()
+                    } else {
+                        searchJob?.cancel()
+                        searchTracks(query)
+                    }
+                }
+        }
+    }
+
+    fun searchTracks(query: String) {
+        if (query == lastQuery) return
+        searchJob?.cancel()
+
+        lastQuery = query
+        _searchState.value = SearchState.Loading
+
+        searchJob = viewModelScope.launch {
+            searchTracks.execute(query).collect { result ->
+                result.onSuccess { tracks ->
+                    lastResults = tracks
+                    _searchState.value = SearchState.Success(tracks)
+                }.onFailure {
+                    _searchState.value = SearchState.Error("No connection")
+                }
+            }
+        }
+    }
+
+    fun retryLastSearch() {
+        lastQuery?.let { searchTracks(it) }
+    }
+
     fun restoreState() {
         lastResults?.let { _searchState.value = SearchState.Success(it) }
     }
 
     fun loadHistory() {
-        _searchState.value = SearchState.History(searchHistory.getHistory())
+        val history = searchHistory.getHistory()
+        _searchState.value = if (history.isEmpty()) SearchState.Empty else SearchState.History(history)
     }
 
     fun clearHistory() {
@@ -40,28 +98,7 @@ class SearchViewModel(
 
     fun addToHistory(track: Track) {
         searchHistory.addTrack(track)
-        if (lastQuery.isNullOrEmpty()) {
-            loadHistory()
-        }
-    }
-
-    fun searchTracks(query: String) {
-        if (query == lastQuery) return
-
-        lastQuery = query
-        _searchState.value = SearchState.Loading
-
-        searchTracks.execute(query) { result ->
-            result.onSuccess { tracks ->
-                lastResults = tracks
-                _searchState.postValue(
-                    if (tracks.isEmpty()) SearchState.Empty
-                    else SearchState.Success(tracks)
-                )
-            }.onFailure {
-                _searchState.postValue(SearchState.Error("No connection"))
-            }
-        }
+        if (lastQuery.isNullOrEmpty()) loadHistory()
     }
 
     fun restoreSearchResults() {
