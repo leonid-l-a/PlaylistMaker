@@ -78,6 +78,7 @@ class PlayerViewModel(
     private fun startPlayer() {
         playerInteractor.play()
         _playerState.value = PlayerState.Playing(0, MAX_TRACK_DURATION)
+        updateJob?.cancel()
         updateJob = viewModelScope.launch {
             while (isActive) {
                 updatePlaybackTime()

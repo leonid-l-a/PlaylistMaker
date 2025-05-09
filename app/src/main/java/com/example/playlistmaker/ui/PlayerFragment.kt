@@ -1,5 +1,6 @@
 package com.example.playlistmaker.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +26,8 @@ import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerFragment : Fragment() {
+class PlayerFragment(
+) : Fragment() {
     private lateinit var binding: FragmentPlayerBinding
 
     private val args: PlayerFragmentArgs by navArgs()
@@ -94,7 +96,7 @@ class PlayerFragment : Fragment() {
                             Glide.with(requireContext())
                                 .load(data.artworkUrl ?: R.drawable.ph_no_track_image)
                                 .placeholder(R.drawable.ph_no_track_image)
-                                .transform(RoundedCorners(8))
+                                .transform(RoundedCorners(8.dpToPx(requireContext())))
                                 .into(trackImage)
                         }
                     }
@@ -164,4 +166,6 @@ class PlayerFragment : Fragment() {
         divider.visibility = View.VISIBLE
         findNavController().popBackStack()
     }
+
+    private  fun Int.dpToPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
 }

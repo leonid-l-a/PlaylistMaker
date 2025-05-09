@@ -1,4 +1,5 @@
 package com.example.playlistmaker.ui
+
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
@@ -25,13 +26,25 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class SearchFragment : Fragment() {
     private lateinit var binding: FragmentSearchBinding
     private val viewModel: SearchViewModel by viewModel()
-    private val searchAdapter: TrackAdapter by lazy { TrackAdapter(emptyList()) { track -> openPlayer(track) } }
-    private val historyAdapter: TrackAdapter by lazy { TrackAdapter(emptyList()) { track -> openPlayer(track) } }
+    private val searchAdapter: TrackAdapter by lazy {
+        TrackAdapter(emptyList()) { track ->
+            openPlayer(
+                track
+            )
+        }
+    }
+    private val historyAdapter: TrackAdapter by lazy {
+        TrackAdapter(emptyList()) { track ->
+            openPlayer(
+                track
+            )
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
@@ -59,7 +72,8 @@ class SearchFragment : Fragment() {
 
     private fun openPlayer(track: Track) {
         viewModel.addToHistory(track)
-        val action = SearchFragmentDirections.actionSearchFragmentToPlayerFragment(trackData = track)
+        val action =
+            SearchFragmentDirections.actionSearchFragmentToPlayerFragment(trackData = track)
         findNavController().navigate(action)
     }
 
@@ -84,7 +98,10 @@ class SearchFragment : Fragment() {
                 viewModel.onQueryChanged(s.toString())
                 clearIcon.isVisible = !s.isNullOrEmpty()
             }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
         })
 
@@ -119,18 +136,41 @@ class SearchFragment : Fragment() {
     }
 
     private fun updateUI(state: SearchState) = with(binding) {
-        progressBar.isVisible = state is SearchState.Loading
-        rvListOfTracks.isVisible = state is SearchState.Success
-        nothingFoundPlaceholder.isVisible = state is SearchState.Success && state.tracks.isEmpty()
-        noConnectionPlaceholder.isVisible = state is SearchState.Error
-        historyLayout.isVisible = state is SearchState.History && state.tracks.isNotEmpty()
+        progressBar.isVisible = false
+        rvListOfTracks.isVisible = false
+        nothingFoundPlaceholder.isVisible = false
+        noConnectionPlaceholder.isVisible = false
+        historyLayout.isVisible = false
+        clearHistoryButton.isVisible = false
 
         when (state) {
-            is SearchState.Success -> searchAdapter.updateData(state.tracks)
-            is SearchState.History -> historyAdapter.updateData(state.tracks)
-            else -> Unit
-        }
+            is SearchState.Loading -> {
+                progressBar.isVisible = true
+            }
 
-        clearHistoryButton.isVisible = state is SearchState.History && state.tracks.isNotEmpty()
+            is SearchState.Success -> {
+                if (state.tracks.isNotEmpty()) {
+                    rvListOfTracks.isVisible = true
+                    searchAdapter.updateData(state.tracks)
+                } else nothingFoundPlaceholder.isVisible = true
+
+            }
+
+            is SearchState.Error -> {
+                noConnectionPlaceholder.isVisible = true
+            }
+
+            is SearchState.History -> {
+                if (state.tracks.isNotEmpty()) {
+                    historyLayout.isVisible = true
+                    clearHistoryButton.isVisible = true
+                }
+                historyAdapter.updateData(state.tracks)
+            }
+
+            is SearchState.Empty -> {
+            }
+        }
     }
+
 }

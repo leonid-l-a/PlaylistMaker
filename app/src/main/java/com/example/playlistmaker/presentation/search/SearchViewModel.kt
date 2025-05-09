@@ -7,11 +7,11 @@ import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.domain.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -22,6 +22,8 @@ class SearchViewModel(
 
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Empty)
     val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
+
+    private var searchJob: Job? = null
 
     private var lastQuery: String?
         get() = savedState["lastQuery"]
@@ -46,11 +48,11 @@ class SearchViewModel(
         viewModelScope.launch {
             queryFlow
                 .debounce(2000L)
-                .distinctUntilChanged()
                 .collect { query ->
                     if (query.isEmpty()) {
                         loadHistory()
                     } else {
+                        searchJob?.cancel()
                         searchTracks(query)
                     }
                 }
@@ -59,11 +61,12 @@ class SearchViewModel(
 
     fun searchTracks(query: String) {
         if (query == lastQuery) return
+        searchJob?.cancel()
 
         lastQuery = query
         _searchState.value = SearchState.Loading
 
-        viewModelScope.launch {
+        searchJob = viewModelScope.launch {
             searchTracks.execute(query).collect { result ->
                 result.onSuccess { tracks ->
                     lastResults = tracks
