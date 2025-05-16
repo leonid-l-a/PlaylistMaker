@@ -6,6 +6,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Track (
+    @SerializedName("trackId")
+    val trackId: Long,
     @SerializedName("trackName")
     val trackName: String,
     @SerializedName("artistName")
@@ -23,5 +25,6 @@ data class Track (
     @SerializedName("country")
     val country: String,
     @SerializedName("previewUrl")
-    val previewUrl: String
+    val previewUrl: String,
+    var isFavorite: Boolean = false,
 ) : Parcelable

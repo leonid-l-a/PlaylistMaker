@@ -30,6 +30,7 @@ class SearchHistoryRepositoryImpl(
         return if (historyJson != null) {
             val type = object : TypeToken<List<Track>>() {}.type
             gson.fromJson(historyJson, type)
+
         } else {
             emptyList()
         }

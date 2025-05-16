@@ -24,7 +24,9 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
-    private lateinit var binding: FragmentSearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel: SearchViewModel by viewModel()
     private val searchAdapter: TrackAdapter by lazy {
         TrackAdapter(emptyList()) { track ->
@@ -33,6 +35,7 @@ class SearchFragment : Fragment() {
             )
         }
     }
+
     private val historyAdapter: TrackAdapter by lazy {
         TrackAdapter(emptyList()) { track ->
             openPlayer(
@@ -46,7 +49,7 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -61,6 +64,11 @@ class SearchFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         updateUIState()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupRecyclerViews() = with(binding) {
