@@ -1,6 +1,6 @@
 package com.example.playlistmaker.data.repository
 
-// data/repository/SearchRepositoryImpl.kt
+import com.example.playlistmaker.data.db.TrackDao
 import com.example.playlistmaker.data.dto.ItunesNetworkResponse
 import com.example.playlistmaker.data.dto.ItunesRequest
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 
 class SearchRepositoryImpl(
     private val networkClient: RetrofitNetworkClient,
+    private val favoriteDao: TrackDao
 ) : SearchRepository {
 
     override fun searchTracks(query: String): Flow<Result<List<Track>>> = flow {
@@ -22,6 +23,12 @@ class SearchRepositoryImpl(
                 val itunesResponse = response as? ItunesNetworkResponse
                 val trackDto = itunesResponse?.results ?: emptyList()
                 val domainTracks = trackDto.map { it.toDomain() }
+
+                val favoriteIds = favoriteDao.getFavoriteIds()
+
+                domainTracks.forEach { track ->
+                    track.isFavorite = track.trackId in favoriteIds
+                }
                 emit(Result.success(domainTracks))
             } else {
                 emit(Result.failure(Throwable("Error code: ${response.resultCode}")))

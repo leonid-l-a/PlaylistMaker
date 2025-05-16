@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val networkModule = module {
     single { RetrofitNetworkClient(get()) }
-    single<SearchRepository> { SearchRepositoryImpl(get()) }
+    single<SearchRepository> { SearchRepositoryImpl(get(), get()) }
 
     single<Retrofit> {
         Retrofit.Builder()

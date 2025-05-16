@@ -6,6 +6,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val libraryModule = module {
-    viewModel { FavoritesViewModel() }
+    viewModel { FavoritesViewModel(get()) }
     viewModel { PlaylistsViewModel() }
 }
