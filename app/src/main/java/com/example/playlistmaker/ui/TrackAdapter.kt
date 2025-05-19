@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui
 
-import android.os.Handler
-import android.os.Looper
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,14 +9,19 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.databinding.ItemTrackBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TrackAdapter(
     private var tracks: List<Track>,
-    private val onItemClickListener: (Track) -> Unit
+    private val onItemClickListener: (Track) -> Unit,
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     private var isClickEnabled = true
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateData(newTracks: List<Track>) {
         tracks = newTracks
         notifyDataSetChanged()
@@ -31,8 +35,6 @@ class TrackAdapter(
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
 
-        holder.itemView.isEnabled = true
-
         holder.itemView.setOnClickListener {
             if (!isClickEnabled) return@setOnClickListener
 
@@ -40,9 +42,10 @@ class TrackAdapter(
 
             onItemClickListener(tracks[position])
 
-            Handler(Looper.getMainLooper()).postDelayed({
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(2000)
                 isClickEnabled = true
-            }, 2000)
+            }
         }
     }
 

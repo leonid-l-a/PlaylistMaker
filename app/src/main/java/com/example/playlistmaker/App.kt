@@ -16,7 +16,8 @@ class App : Application() {
                 settingsModule,
                 searchModule,
                 libraryModule,
-                mainModule
+                mainModule,
+                favoriteModule,
             )
         }
     }

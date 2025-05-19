@@ -106,18 +106,18 @@
             android:layout_marginTop="30dp"
             android:background="@null"
             android:src="@drawable/ic_play"
-            app:layout_constraintEnd_toStartOf="@id/ibLike"
+            app:layout_constraintEnd_toStartOf="@id/ibIsFavorite"
             app:layout_constraintStart_toEndOf="@id/ibAddToPlaylist"
             app:layout_constraintTop_toBottomOf="@id/tvArtistName"
             android:contentDescription="@string/play_button" />
 
         <ImageButton
-            android:id="@+id/ibLike"
+            android:id="@+id/ibIsFavorite"
             android:layout_width="51dp"
             android:layout_height="51dp"
             android:background="@drawable/round_button"
             android:contentDescription="@string/like"
-            android:src="@drawable/ic_like"
+            android:src="@drawable/ic_white_heart"
             app:layout_constraintBottom_toBottomOf="@+id/ibPlay"
             app:layout_constraintEnd_toEndOf="@id/rightBorder"
             app:layout_constraintStart_toEndOf="@id/ibPlay"

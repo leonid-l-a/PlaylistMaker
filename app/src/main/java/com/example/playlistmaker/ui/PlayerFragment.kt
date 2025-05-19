@@ -26,10 +26,9 @@ import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerFragment(
-) : Fragment() {
-    private lateinit var binding: FragmentPlayerBinding
+class PlayerFragment : Fragment() {
 
+    private lateinit var binding: FragmentPlayerBinding
     private val args: PlayerFragmentArgs by navArgs()
 
     private val viewModel: PlayerViewModel by viewModel {
@@ -40,7 +39,7 @@ class PlayerFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         binding = FragmentPlayerBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -57,7 +56,8 @@ class PlayerFragment(
                 override fun handleOnBackPressed() {
                     handleBackPressed()
                 }
-            })
+            }
+        )
     }
 
     override fun onPause() {
@@ -74,9 +74,12 @@ class PlayerFragment(
         binding.searchScreenToolbar.setNavigationOnClickListener { handleBackPressed() }
         binding.ibPlay.setOnClickListener { viewModel.playbackControl() }
 
+        binding.ibIsFavorite.setOnClickListener {
+            viewModel.toggleFavorite()
+        }
+
         lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED)
-            {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.trackData.collect { trackData ->
                     trackData?.let { data ->
                         with(binding) {
@@ -101,16 +104,13 @@ class PlayerFragment(
                         }
                     }
                 }
-
             }
         }
-
     }
 
     private fun setupObservers() {
         lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED)
-            {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.playerState.collect { state ->
                     when (state) {
                         is PlayerState.Preparing -> {
@@ -149,23 +149,36 @@ class PlayerFragment(
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isFavorite.collect { isFavorite ->
+                    updateFavoriteIcon(isFavorite)
+                }
+            }
+        }
+
     }
 
     private fun hideBottomNavView() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-            View.GONE
-        requireActivity().findViewById<View>(R.id.divider).visibility =
-            View.GONE
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.GONE
+        requireActivity().findViewById<View>(R.id.divider).visibility = View.GONE
     }
 
     private fun handleBackPressed() {
-        val bottomNav =
-            requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        bottomNav.visibility = View.VISIBLE
-        val divider = requireActivity().findViewById<View>(R.id.divider)
-        divider.visibility = View.VISIBLE
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.VISIBLE
+        requireActivity().findViewById<View>(R.id.divider).visibility = View.VISIBLE
         findNavController().popBackStack()
     }
 
-    private  fun Int.dpToPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
+    private fun Int.dpToPx(context: Context): Int =
+        (this * context.resources.displayMetrics.density).toInt()
+
+    private fun updateFavoriteIcon(isFavorite: Boolean) {
+        if (isFavorite) {
+            binding.ibIsFavorite.setImageResource(R.drawable.ic_red_heart)
+        } else {
+            binding.ibIsFavorite.setImageResource(R.drawable.ic_white_heart)
+        }
+    }
+
 }

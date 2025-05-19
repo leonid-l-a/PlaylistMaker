@@ -9,6 +9,8 @@ import java.util.Locale
 
 @Parcelize
 data class TrackDto(
+    @SerializedName("trackId")
+    val trackId: Long,
     @SerializedName("trackName")
     val trackName: String,
     @SerializedName("artistName")
@@ -32,6 +34,7 @@ data class TrackDto(
     fun toDomain(): Track {
         val formattedTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(trackTimeMillis)
         return Track(
+            trackId = trackId,
             trackName = trackName,
             artistName = artistName,
             trackTimeMillis = formattedTime,
@@ -40,7 +43,7 @@ data class TrackDto(
             releaseDate = releaseDate,
             primaryGenreName = primaryGenreName,
             country = country,
-            previewUrl = previewUrl
+            previewUrl = previewUrl,
         )
     }
 }
