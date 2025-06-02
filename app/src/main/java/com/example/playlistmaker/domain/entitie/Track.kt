@@ -1,6 +1,7 @@
 package com.example.playlistmaker.domain.entitie
 
 import android.os.Parcelable
+import com.example.playlistmaker.data.db.TrackPlaylistsEntity
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
@@ -28,3 +29,18 @@ data class Track (
     val previewUrl: String,
     var isFavorite: Boolean = false,
 ) : Parcelable
+
+fun Track.toTrackPlaylistsEntity(): TrackPlaylistsEntity {
+    return TrackPlaylistsEntity(
+        trackId = this.trackId,
+        trackName = this.trackName,
+        artistName = this.artistName,
+        trackTimeMillis = this.trackTimeMillis,
+        artworkUrl100 = this.artworkUrl100,
+        collectionName = this.collectionName,
+        releaseDate = this.releaseDate,
+        primaryGenreName = this.primaryGenreName,
+        country = this.country,
+        previewUrl = this.previewUrl
+    )
+}

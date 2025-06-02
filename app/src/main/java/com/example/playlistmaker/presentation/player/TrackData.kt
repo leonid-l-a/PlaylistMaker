@@ -9,5 +9,5 @@ data class TrackData(
     val year: String,
     val genre: String,
     val country: String,
-    var isFavorite: Boolean
+    val isFavorite: Boolean,
 )

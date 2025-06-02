@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/common_screen_background_tint">
+
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="160dp"
+        android:layout_height="196dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/common_screen_background_tint"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/ivPlaylistIcon"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/tvPlaylistName"
+            style="@style/playlist_item_text_style"
+            tools:text="NAMENAMENAMENAMENAMENAMENAMENAME" />
+
+        <TextView
+            android:id="@+id/tvTrackCount"
+            style="@style/playlist_item_text_style"
+            tools:text="TRACKSCOUNTTRACKSCOUNTTRACKSCOUNT" />
+
+    </LinearLayout>
+
+</FrameLayout>

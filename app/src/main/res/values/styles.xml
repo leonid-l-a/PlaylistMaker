@@ -79,5 +79,21 @@
         <item name="itemRippleColor">@android:color/transparent</item>
     </style>
 
+    <style name="OutlinedTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/box_stroke_color_selector</item>
+        <item name="hintTextColor">@color/hint_color_selector</item>
+        <item name="android:textColor">@color/common_text_color</item>
+        <item name="android:textColorHint">@color/common_text_color</item>
+    </style>
 
+    <style name="playlist_item_text_style">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="fontWeight">400</item>
+        <item name="android:textColor">@color/common_text_color</item>
+        <item name="maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 </resources>
