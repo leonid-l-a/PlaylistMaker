@@ -213,10 +213,36 @@ class PlayerViewModel(
 
     fun addTrackToPlaylist(playlist: PlaylistEntity) {
         viewModelScope.launch {
-            playlistInteractor.addTrackToPlaylist(
+            val result = playlistInteractor.addTrackToPlaylist(
                 track.toTrackPlaylistsEntity(),
                 playlist.playlistId!!
             )
+
+            if (result) {
+                val updatedPlaylists = getPlaylists()
+                _playerState.update { old ->
+                    old.copy(
+                        addTrackResult = PlayerScreenState.AddTrackResult(
+                            success = true,
+                            playlistName = playlist.playlistName
+                        ),
+                        playlists = updatedPlaylists
+                    )
+                }
+            } else {
+                _playerState.update { old ->
+                    old.copy(
+                        addTrackResult = PlayerScreenState.AddTrackResult(
+                            success = false,
+                            playlistName = playlist.playlistName
+                        )
+                    )
+                }
+            }
         }
+    }
+
+    fun resetAddTrackResult() {
+        _playerState.update { it.copy(addTrackResult = null) }
     }
 }

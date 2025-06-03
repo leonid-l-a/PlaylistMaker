@@ -36,7 +36,6 @@ class PlayerFragment : Fragment() {
     private val playlistsAdapter: PlaylistsAdapterForPlayerScreen by lazy {
         PlaylistsAdapterForPlayerScreen { playlist ->
             viewModel.addTrackToPlaylist(playlist)
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
     }
 
@@ -152,8 +151,20 @@ class PlayerFragment : Fragment() {
                         }
                     }
 
+                    state.addTrackResult?.let { result ->
+                        val message = if (result.success) {
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                            getString(R.string.added_to_playlist) + result.playlistName
+                        } else {
+                            getString(R.string.already_in_playlist) + result.playlistName
+                        }
+
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                        viewModel.resetAddTrackResult()
+
+                    }
+
                     state.playlists?.let { playlists ->
-                        println("Playlists data: $playlists")
                         playlistsAdapter.submitList(playlists)
                     }
 

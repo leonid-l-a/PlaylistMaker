@@ -11,7 +11,8 @@ data class PlayerScreenState(
     val isFavorite: Boolean = false,
     val trackData: TrackData? = null,
     val errorMessage: String? = null,
-    val playlists: List<PlaylistEntity>? = null
+    val playlists: List<PlaylistEntity>? = null,
+    val addTrackResult: AddTrackResult? = null
 ) {
     enum class Status {
         PREPARING,
@@ -21,4 +22,8 @@ data class PlayerScreenState(
         COMPLETED,
         ERROR
     }
+    data class AddTrackResult(
+        val success: Boolean,
+        val playlistName: String
+    )
 }

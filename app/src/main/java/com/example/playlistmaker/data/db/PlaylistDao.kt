@@ -65,7 +65,7 @@ interface PlaylistDao {
     }
 
     @Transaction
-    suspend fun insertTrackAndUpdateCount(track: TrackPlaylistsEntity, playlistId: Long) {
+    suspend fun insertTrackAndUpdateCount(track: TrackPlaylistsEntity, playlistId: Long): Boolean {
         val existingRef = getPlaylistTrackCrossRef(playlistId, track.trackId)
 
         if (existingRef == null) {
@@ -74,7 +74,9 @@ interface PlaylistDao {
 
             val playlist = getPlaylistById(playlistId)
             updatePlaylist(playlist.copy(trackCount = playlist.trackCount + 1))
+            return true
         }
+        return false
     }
 
     @Query("SELECT * FROM playlist_track_cross_ref WHERE playlistId = :playlistId AND trackId = :trackId LIMIT 1")

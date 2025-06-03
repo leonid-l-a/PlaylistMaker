@@ -9,8 +9,8 @@ class PlaylistInteractorImpl(
     private val repository: PlaylistRepository
 ) : PlaylistInteractor {
 
-    override suspend fun addTrackToPlaylist(track: TrackPlaylistsEntity, playlistId: Long) {
-        repository.addTrackToPlaylist(track, playlistId)
+    override suspend fun addTrackToPlaylist(track: TrackPlaylistsEntity, playlistId: Long): Boolean {
+        return repository.addTrackToPlaylist(track, playlistId)
     }
 
     override suspend fun removeTrackFromPlaylist(trackId: Long, playlistId: Long) {

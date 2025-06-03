@@ -21,6 +21,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistCreationBinding
 import com.example.playlistmaker.presentation.library.PlaylistCreationViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -177,9 +178,25 @@ class PlaylistCreationFragment : Fragment() {
     }
 
     private fun handleBackPressed() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-            View.VISIBLE
-        requireActivity().findViewById<View>(R.id.divider).visibility = View.VISIBLE
-        findNavController().popBackStack()
+        val isImageEmpty = viewModel.selectedImageUri.value == null
+        val isNameEmpty = binding.playlistsName.text.toString().isBlank()
+        val isDescriptionEmpty = binding.playlistDescription.text.toString().isBlank()
+
+        if (isImageEmpty && isNameEmpty && isDescriptionEmpty) {
+            requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.VISIBLE
+            requireActivity().findViewById<View>(R.id.divider).visibility = View.VISIBLE
+            findNavController().popBackStack()
+        } else {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Вы действительно хотите выйти?")
+                .setMessage("Все данные будут потеряны")
+                .setNegativeButton("Отмена") { dialog, _ -> }
+                .setPositiveButton("Завершить") { _, _ ->
+                    requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.VISIBLE
+                    requireActivity().findViewById<View>(R.id.divider).visibility = View.VISIBLE
+                    findNavController().popBackStack()
+                }
+                .show()
+        }
     }
 }

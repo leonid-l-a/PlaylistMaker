@@ -20,8 +20,8 @@ class PlaylistRepositoryImpl(
         playlistDao.insertPlaylist(entity)
     }
 
-    override suspend fun addTrackToPlaylist(track: TrackPlaylistsEntity, playlistId: Long) {
-        playlistDao.insertTrackAndUpdateCount(track, playlistId)
+    override suspend fun addTrackToPlaylist(track: TrackPlaylistsEntity, playlistId: Long): Boolean {
+        return playlistDao.insertTrackAndUpdateCount(track, playlistId)
     }
 
     @Transaction
