@@ -60,7 +60,7 @@ class TrackAdapter(
 
             Glide.with(binding.root)
                 .load(track.artworkUrl100)
-                .placeholder(R.drawable.ph_no_track_image)
+                .placeholder(R.drawable.ph_no_image)
                 .transform(RoundedCorners(2))
                 .into(binding.ivTrackIcon)
         }

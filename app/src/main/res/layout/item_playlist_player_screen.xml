@@ -1,0 +1,45 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/big_line_height"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingHorizontal="13dp">
+
+    <ImageView
+        android:id="@+id/ivPlaylistIcon"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:layout_marginTop="6dp"
+        android:id="@+id/tvPlaylistName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/common_text_color"
+        tools:text="Название плейлиста"
+        app:layout_constraintStart_toEndOf="@id/ivPlaylistIcon"
+        app:layout_constraintTop_toTopOf="@id/ivPlaylistIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:layout_marginStart="8dp"
+        />
+
+    <TextView
+        android:id="@+id/tvTrackCount"
+        style="@style/track_artist_name_and_time_style"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        tools:text="Количество треков"
+        app:layout_constraintTop_toBottomOf="@id/tvPlaylistName"
+        app:layout_constraintStart_toStartOf="@id/tvPlaylistName"
+        app:layout_constraintEnd_toEndOf="@id/tvPlaylistName" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,4 +8,5 @@
     <color name="track_name_color">#FFFFFF</color>
     <color name="player_activity_button_color">#40FFFFFF
     </color>
+    <color name="drag_handle_color">#FFFFFF</color>
 </resources>

@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.peko)
 
     implementation (libs.jetbrains.kotlinx.coroutines.android)
     implementation(libs.androidx.navigation.fragment.ktx)

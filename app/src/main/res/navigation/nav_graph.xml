@@ -7,10 +7,13 @@
         android:id="@+id/libraryFragment"
         android:name="com.example.playlistmaker.ui.library.LibraryFragment"
         android:label="LibraryFragment">
-
         <action
             android:id="@+id/action_libraryFragment_to_playerFragment"
             app:destination="@id/playerFragment" />
+        <action
+            android:id="@+id/action_libraryFragment_to_playlistCreationFragment"
+            app:destination="@+id/playlistCreationFragment"
+            />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -28,8 +31,18 @@
         android:id="@+id/playerFragment"
         android:name="com.example.playlistmaker.ui.PlayerFragment"
         android:label="PlayerFragment">
+        <action
+            android:id="@+id/action_playerFragment_to_playlistCreationFragment"
+            app:destination="@+id/playlistCreationFragment"/>
         <argument
             android:name="trackData"
-            app:argType="com.example.playlistmaker.domain.entitie.Track"/>
+            app:argType="com.example.playlistmaker.domain.entitie.Track"
+            app:nullable="false"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/playlistCreationFragment"
+        android:name="com.example.playlistmaker.ui.PlaylistCreationFragment"
+        android:label="PlaylistCreationFragment"
+        />
 </navigation>
