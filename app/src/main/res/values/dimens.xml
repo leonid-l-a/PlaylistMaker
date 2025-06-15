@@ -8,4 +8,5 @@
     <dimen name="big_padding">21dp</dimen>
     <dimen name="big_line_height">61dp</dimen>
     <dimen name="common_line_height">56dp</dimen>
+    <dimen name="playlist_menu_peek_height">383dp</dimen>
 </resources>

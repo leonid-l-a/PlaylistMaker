@@ -30,7 +30,7 @@
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/NoBackgroundBottomNav"
+        style="@style/no_background_bottom_nav"
         android:background="@color/common_screen_background_tint"
         app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/bottom_nav_selector"

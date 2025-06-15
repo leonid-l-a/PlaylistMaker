@@ -4,11 +4,11 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.domain.use_case.settings.inter.GetDarkModeUseCase
-import com.example.playlistmaker.domain.use_case.settings.inter.OpenUserAgreementUseCase
-import com.example.playlistmaker.domain.use_case.settings.inter.SendSupportEmailUseCase
-import com.example.playlistmaker.domain.use_case.settings.inter.SetDarkModeUseCase
-import com.example.playlistmaker.domain.use_case.settings.inter.ShareAppUseCase
+import com.example.playlistmaker.domain.use_case.inter.GetDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.inter.OpenUserAgreementUseCase
+import com.example.playlistmaker.domain.use_case.inter.SendSupportEmailUseCase
+import com.example.playlistmaker.domain.use_case.inter.SetDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.inter.ShareAppUseCase
 
 class SettingsViewModel(
     private val shareAppUseCase: ShareAppUseCase,

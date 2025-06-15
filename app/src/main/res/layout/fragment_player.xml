@@ -239,7 +239,7 @@
         android:visibility="gone" />
 
     <LinearLayout
-        android:id="@+id/playlists_bottom_sheet"
+        android:id="@+id/bsPlaylists"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bottom_sheet_bg"
