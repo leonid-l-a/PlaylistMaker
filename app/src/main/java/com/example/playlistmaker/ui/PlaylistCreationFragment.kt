@@ -15,35 +15,38 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
+import com.example.playlistmaker.data.db.PlaylistEntity
 import com.example.playlistmaker.databinding.FragmentPlaylistCreationBinding
 import com.example.playlistmaker.presentation.library.PlaylistCreationViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.core.net.toUri
 
-class PlaylistCreationFragment : Fragment() {
+open class PlaylistCreationFragment : Fragment() {
 
     private var _binding: FragmentPlaylistCreationBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: PlaylistCreationViewModel by viewModel()
 
+    private var isEditMode: Boolean = false
+
     private val imagePickerLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                viewModel.onImageSelected(it)
-            }
+            uri?.let { viewModel.onImageSelected(it) }
         }
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                imagePickerLauncher.launch("image/*")
-            }
+            if (granted) imagePickerLauncher.launch("image/*")
         }
 
     override fun onCreateView(
@@ -55,96 +58,145 @@ class PlaylistCreationFragment : Fragment() {
         return binding.root
     }
 
-    private fun hideBottomNavView() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-            View.GONE
-        requireActivity().findViewById<View>(R.id.divider).visibility = View.GONE
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        hideBottomNavView()
+        hideBottomNav()
 
-        binding.playlistImage.setOnClickListener {
-            checkAndRequestPermission()
+        val playlistArg: PlaylistEntity? = arguments?.getParcelable("playlist")
+        playlistArg?.let {
+            isEditMode = true
+            viewModel.setPlaylist(it)
+
+            binding.playlistsName.setText(it.playlistName)
+            binding.playlistDescription.setText(it.playlistDescription)
+            it.imagePath?.let { path -> binding.playlistImage.setImageURI(path.toUri()) }
+
+            setCreateButtonColor(it.playlistName)
         }
 
-        binding.playlistCreationScreenToolbar.setNavigationOnClickListener {
-            handleBackPressed()
-        }
+        configureMode()
+
+        setupClickListeners()
+        observeViewModel()
+    }
+
+    private fun configureMode() {
+        binding.playlistCreationScreenToolbar.title =
+            if (isEditMode) getString(R.string.edit_playlist) else getString(R.string.new_playlist)
+
+        binding.buttonCreatePlaylist.text =
+            if (isEditMode) getString(R.string.save) else getString(R.string.create)
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    handleBackPressed()
-                }
+                override fun handleOnBackPressed() =
+                    this@PlaylistCreationFragment.handleBackPressed()
             }
         )
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.playlistCreationState.collect { result ->
-                result?.let {
-                    if (it.isSuccess) {
-                        parentFragmentManager.popBackStack()
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Ошибка создания: ${it.exceptionOrNull()?.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+        binding.playlistCreationScreenToolbar.setNavigationOnClickListener {
+            handleBackPressed()
+        }
+    }
+
+    private fun handleBackPressed() {
+        if (isEditMode) {
+            restoreBottomNav()
+            findNavController().popBackStack()
+            return
+        }
+
+        val isEmptyName = binding.playlistsName.text.isNullOrBlank()
+        val isEmptyDesc = binding.playlistDescription.text.isNullOrBlank()
+        val isEmptyImage = viewModel.state.value.selectedImageUri == null
+
+        if (isEmptyName && isEmptyDesc && isEmptyImage) {
+            restoreBottomNav()
+            findNavController().popBackStack()
+        } else {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Вы действительно хотите выйти?")
+                .setMessage("Все данные будут потеряны")
+                .setNegativeButton("Отмена") { dialog, _ -> }
+                .setPositiveButton("Завершить") { _, _ ->
+                    restoreBottomNav()
+                    findNavController().popBackStack()
+                }
+                .show()
+        }
+    }
+
+    private fun restoreBottomNav() {
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+            .visibility = View.VISIBLE
+        requireActivity().findViewById<View>(R.id.divider)
+            .visibility = View.VISIBLE
+    }
+
+    private fun setupClickListeners() {
+        binding.playlistImage.setOnClickListener { checkAndRequestPermission() }
+
+        binding.buttonCreatePlaylist.setOnClickListener {
+            if (isEditMode) {
+
+                val name = binding.playlistsName.text.toString().trim()
+                val desc =
+                    binding.playlistDescription.text.toString().trim().takeIf { it.isNotEmpty() }
+
+                viewModel.updatePlaylist(
+                    name = name,
+                    description = desc,
+                    context = requireContext()
+                )
+            } else {
+                val name = binding.playlistsName.text.toString().trim()
+                val desc =
+                    binding.playlistDescription.text.toString().trim().takeIf { it.isNotEmpty() }
+                if (name.isNotEmpty()) {
+                    viewModel.createPlaylist(name, desc, requireContext())
                 }
             }
+            restoreBottomNav()
+            findNavController().popBackStack()
         }
 
         binding.playlistsName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val isNotEmpty = !s.isNullOrBlank()
-                setCreateButtonState(isNotEmpty)
+                setCreateButtonColor(s)
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
 
-        binding.buttonCreatePlaylist.setOnClickListener {
-            val name = binding.playlistsName.text.toString().trim()
-            val description =
-                binding.playlistDescription.text.toString().trim().takeIf { it.isNotEmpty() }
-
-            if (name.isNotEmpty()) {
-                viewModel.createPlaylist(name, description, requireContext())
-            }
-
-            requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-                View.VISIBLE
-            requireActivity().findViewById<View>(R.id.divider).visibility =
-                View.VISIBLE
-
-        }
-
-        lifecycleScope.launchWhenStarted {
-            viewModel.selectedImageUri.collectLatest { uri ->
-                if (uri != null) {
-                    binding.playlistImage.setImageURI(uri)
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.playlistCreationState.collect { result ->
+                    result?.let {
+                        if (it.isSuccess) {
+                            findNavController().popBackStack()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Что-то пошло не так при создании плейлиста",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                 }
             }
         }
 
-
-        setCreateButtonState(false)
-    }
-
-    private fun setCreateButtonState(enabled: Boolean) {
-        binding.buttonCreatePlaylist.isEnabled = enabled
-        val colorRes = if (enabled) R.color.focused_box_color else R.color.unfocused_box_color
-        binding.buttonCreatePlaylist.setBackgroundColor(
-            ContextCompat.getColor(
-                requireContext(),
-                colorRes
-            )
-        )
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collectLatest { state ->
+                    state.selectedImageUri?.let { binding.playlistImage.setImageURI(it) }
+                }
+            }
+        }
     }
 
     private fun checkAndRequestPermission() {
@@ -172,31 +224,24 @@ class PlaylistCreationFragment : Fragment() {
         }
     }
 
+    private fun hideBottomNav() {
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+            .visibility = View.GONE
+        requireActivity().findViewById<View>(R.id.divider)
+            .visibility = View.GONE
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    private fun handleBackPressed() {
-        val isImageEmpty = viewModel.selectedImageUri.value == null
-        val isNameEmpty = binding.playlistsName.text.toString().isBlank()
-        val isDescriptionEmpty = binding.playlistDescription.text.toString().isBlank()
-
-        if (isImageEmpty && isNameEmpty && isDescriptionEmpty) {
-            requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.VISIBLE
-            requireActivity().findViewById<View>(R.id.divider).visibility = View.VISIBLE
-            findNavController().popBackStack()
-        } else {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Вы действительно хотите выйти?")
-                .setMessage("Все данные будут потеряны")
-                .setNegativeButton("Отмена") { dialog, _ -> }
-                .setPositiveButton("Завершить") { _, _ ->
-                    requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.VISIBLE
-                    requireActivity().findViewById<View>(R.id.divider).visibility = View.VISIBLE
-                    findNavController().popBackStack()
-                }
-                .show()
-        }
+    private fun setCreateButtonColor(s: CharSequence?) {
+        binding.buttonCreatePlaylist.isEnabled = !s.isNullOrBlank()
+        val colorRes =
+            if (!s.isNullOrBlank()) R.color.focused_box_color else R.color.unfocused_box_color
+        binding.buttonCreatePlaylist.setBackgroundColor(
+            ContextCompat.getColor(requireContext(), colorRes)
+        )
     }
 }

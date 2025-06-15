@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.R
+import com.example.playlistmaker.data.db.PlaylistEntity
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker.presentation.library.PlaylistsState
 import com.example.playlistmaker.presentation.library.PlaylistsViewModel
@@ -60,11 +61,11 @@ class PlaylistsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = PlaylistsAdapterForLibraryScreen { playlist ->
-            // Обработка клика по плейлисту
+            openPlaylist(playlist)
         }
 
         binding.rvPlaylists.apply {
-            layoutManager = GridLayoutManager(requireContext(), 2) // 2 столбца
+            layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = this@PlaylistsFragment.adapter
         }
     }
@@ -112,5 +113,11 @@ class PlaylistsFragment : Fragment() {
     private fun handleBackPressed() {
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
             View.VISIBLE
+    }
+
+    private fun openPlaylist(playlist: PlaylistEntity) {
+        val action =
+            LibraryFragmentDirections.actionLibraryFragmentToPlaylistFragment(playlist.playlistId!!)
+        findNavController().navigate(action)
     }
 }

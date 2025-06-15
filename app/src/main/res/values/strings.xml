@@ -1,56 +1,73 @@
 <resources>
-    <string name="app_name">PlaylistMaker</string>
-    <string name="search">Поиск</string>
-    <string name="clear">отчистить поле ввода</string>
-    <string name="settings">Настройки</string>
-    <string name="library">Медиатека</string>
-    <string name="share">Поделиться приложением</string>
-    <string name="dark_mode">Тёмная тема</string>
-    <string name="support">Написать в поддержку</string>
-    <string name="user_agreement">Пользовательское соглашение</string>
-    <string name="share_text">Изучайте Android-разработку с Яндекс Практикумом: https://practicum.yandex.ru/android-developer/</string>
-    <string name="support_email">"leo.lapaeff@gmail.com"</string>
-    <string name="support_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
-    <string name="support_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
-    <string name="user_agreement_uri">https://yandex.ru/legal/practicum_offer/</string>
-    <string name="share_app">Поделиться приложением</string>
-    <string name="text_to_support">Написать в поддержку</string>
-    <string name="track_name">Smells Like Teen Spirit</string>
-    <string name="trackArtistName">Nirvana</string>
-    <string name="track_time">5:01</string>
-    <string name="no_connection_text">Проблемы со связью\n\nЗагрузка не удалась. Проверьте\nподключение к интернету</string>
-    <string name="retrySearch">Обновить</string>
-    <string name="nothing_found">Ничего не нашлось</string>
-    <string name="search_history">Вы искали</string>
-    <string name="clear_history">Очистить историю</string>
-    <string name="add_to_playlist">Add to playlist</string>
-    <string name="track_image">track image</string>
-    <string name="like">like_button\n</string>
-    <string name="track_durability">Длительность</string>
-    <string name="track_album_text">Альбом</string>
-    <string name="track_year_text">Год</string>
-    <string name="track_genre_text">Жанр</string>
-    <string name="track_country_text">Страна</string>
-    <string name="play_button">play</string>
-    <string name="time_zero">00:00</string>
-    <string name="time_start">00:30</string>
-    <string name="empty_library">Ваша медиатека пуста</string>
-    <string name="new_playlist">Новый плейлист</string>
-    <string name="no_playlists_created">Вы не создали\nни одного плейлиста</string>
-    <string name="tab_favorites">Избранные треки</string>
-    <string name="tab_playlists">Плейлисты</string>
-    <string name="create">Создать</string>
-    <string name="description">Описание</string>
-    <string name="name">Название*</string>
-    <string name="add_to_playlist_ru">Добавить в плейлист</string>
-    <string name="added_to_playlist">"Добавлено в плейлист "</string>
-    <string name="already_in_playlist">"Трек уже добавлен в плейлист "</string>
+    <string name="app_name" translatable="false">PlaylistMaker</string>
+    <string name="search">Search</string>
+    <string name="clear">"clear "</string>
+    <string name="settings">Settings</string>
+    <string name="library">Library</string>
+    <string name="share">Share</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="support">Support</string>
+    <string name="user_agreement">User agreement</string>
+    <string name="support_email" translatable="false">"leo.lapaeff@gmail.com"</string>
+    <string name="support_subject">"Message to the developers of the Playlist Maker app "</string>
+    <string name="support_text">"Thanks to the developers for a cool app! "</string>
+    <string name="user_agreement_uri" translatable="false">https://yandex.ru/legal/practicum_offer/</string>
+    <string name="share_app">Share</string>
+    <string name="text_to_support">Support</string>
+    <string name="track_name" translatable="false">Smells Like Teen Spirit</string>
+    <string name="trackArtistName" translatable="false">Nirvana</string>
+    <string name="track_time" translatable="false">5:01</string>
+    <string name="no_connection_text">" Connection problems\\n\\nDownload failed. Check your\\nInternet connection"</string>
+    <string name="retrySearch">Retry</string>
+    <string name="nothing_found">Nothing found</string>
+    <string name="search_history">Search history</string>
+    <string name="clear_history">Clear history</string>
+    <string name="add_to_playlist" translatable="false">Add to playlist</string>
+    <string name="track_image" translatable="false">track image</string>
+    <string name="like" translatable="false">like_button\n</string>
+    <string name="track_durability">Durability</string>
+    <string name="track_album_text">Album</string>
+    <string name="track_year_text">Year</string>
+    <string name="track_genre_text">Genre</string>
+    <string name="track_country_text">Country</string>
+    <string name="play_button" translatable="false">play</string>
+    <string name="time_zero" translatable="false">00:00</string>
+    <string name="time_start" translatable="false">00:30</string>
+    <string name="empty_library">Your library is empty</string>
+    <string name="new_playlist">New playlist</string>
+    <string name="no_playlists_created">You haven\'t created\\т any playlists yet.</string>
+    <string name="tab_favorites">Favourite tracks</string>
+    <string name="tab_playlists">Playlists</string>
+    <string name="create">Create</string>
+    <string name="description">Description</string>
+    <string name="name">Name*</string>
+    <string name="add_to_playlist_ru">Add to playlist</string>
+    <string name="added_to_playlist">"Added to playlist "</string>
+    <string name="already_in_playlist">Track is already added</string>
+    <string name="playlist_image" translatable="false">Playlist image</string>
+    <string name="button_more" translatable="false">more</string>
+    <string name="button_share" translatable="false">share</string>
 
     <plurals name="tracks_count">
-        <item quantity="zero">%d треков</item>
-        <item quantity="one">%d трек</item>
-        <item quantity="few">%d трека</item>
-        <item quantity="many">%d треков</item>
-        <item quantity="other">%d треков</item>
+        <item quantity="zero">%d tracks</item>
+        <item quantity="one">%d track</item>
+        <item quantity="other">%d tracks</item>
     </plurals>
+
+    <plurals name="playlist_duration">
+        <item quantity="zero">%d minutes</item>
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <string name="share_text">"Learn Android development with Yandex Practicum: https://practicum.yandex.ru/android-developer/ "</string>
+    <string name="edit">Edit playlist\n</string>
+    <string name="delete_playlist">Delete playlist</string>
+    <string name="delete_playlist_dialog_title">Delete playlist</string>
+    <string name="delete_playlist_dialog_message">Are you sure?</string>
+    <string name="remove_track_dialog_title">Delete track</string>
+    <string name="remove_track_dialog_message">Are you sure?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="edit_playlist">Редактировать</string>
+    <string name="save">Сохранить</string>
 </resources>

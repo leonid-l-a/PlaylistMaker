@@ -86,7 +86,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun setupBottomSheet() {
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bsPlaylists).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
             isHideable = true
             addBottomSheetCallback(bottomSheetCallback)

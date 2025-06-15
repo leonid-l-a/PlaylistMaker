@@ -7,13 +7,18 @@
         android:id="@+id/libraryFragment"
         android:name="com.example.playlistmaker.ui.library.LibraryFragment"
         android:label="LibraryFragment">
+
         <action
             android:id="@+id/action_libraryFragment_to_playerFragment"
             app:destination="@id/playerFragment" />
+
         <action
             android:id="@+id/action_libraryFragment_to_playlistCreationFragment"
-            app:destination="@+id/playlistCreationFragment"
-            />
+            app:destination="@+id/playlistCreationFragment" />
+
+        <action
+            android:id="@+id/action_libraryFragment_to_playlistFragment"
+            app:destination="@+id/playlistFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -33,16 +38,43 @@
         android:label="PlayerFragment">
         <action
             android:id="@+id/action_playerFragment_to_playlistCreationFragment"
-            app:destination="@+id/playlistCreationFragment"/>
+            app:destination="@+id/playlistCreationFragment" />
         <argument
             android:name="trackData"
             app:argType="com.example.playlistmaker.domain.entitie.Track"
-            app:nullable="false"/>
+            app:nullable="false" />
     </fragment>
 
     <fragment
         android:id="@+id/playlistCreationFragment"
         android:name="com.example.playlistmaker.ui.PlaylistCreationFragment"
-        android:label="PlaylistCreationFragment"
-        />
+        android:label="PlaylistCreationFragment">
+        <argument
+            android:name="playlist"
+            app:nullable="true"
+            android:defaultValue="@null"
+            app:argType="com.example.playlistmaker.data.db.PlaylistEntity" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/playlistFragment"
+        android:name="com.example.playlistmaker.ui.PlaylistFragment"
+        android:label="PlaylistsFragment">
+        <argument
+            android:name="playlistData"
+            app:argType="long"
+            app:nullable="false" />
+        <action
+            android:id="@+id/action_playlistFragment_to_playerFragment"
+            app:destination="@+id/playerFragment" />
+        <action
+            android:id="@+id/action_playlistFragment_to_playlistEditFragment"
+            app:destination="@+id/playlistCreationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.example.playlistmaker.ui.library.PlaylistsFragment"
+        android:label="PlaylistsFragment" />
+
 </navigation>
