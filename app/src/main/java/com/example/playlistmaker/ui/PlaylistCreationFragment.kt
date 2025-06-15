@@ -50,8 +50,7 @@ open class PlaylistCreationFragment : Fragment() {
         }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentPlaylistCreationBinding.inflate(inflater, container, false)
@@ -75,7 +74,6 @@ open class PlaylistCreationFragment : Fragment() {
         }
 
         configureMode()
-
         setupClickListeners()
         observeViewModel()
     }
@@ -102,7 +100,6 @@ open class PlaylistCreationFragment : Fragment() {
 
     private fun handleBackPressed() {
         if (isEditMode) {
-            restoreBottomNav()
             findNavController().popBackStack()
             return
         }
@@ -138,27 +135,19 @@ open class PlaylistCreationFragment : Fragment() {
         binding.playlistImage.setOnClickListener { checkAndRequestPermission() }
 
         binding.buttonCreatePlaylist.setOnClickListener {
+            val name = binding.playlistsName.text.toString().trim()
+            val desc =
+                binding.playlistDescription.text.toString().trim().takeIf { it.isNotEmpty() }
+
             if (isEditMode) {
-
-                val name = binding.playlistsName.text.toString().trim()
-                val desc =
-                    binding.playlistDescription.text.toString().trim().takeIf { it.isNotEmpty() }
-
-                viewModel.updatePlaylist(
-                    name = name,
-                    description = desc,
-                    context = requireContext()
-                )
+                viewModel.updatePlaylist(name = name, description = desc, context = requireContext())
             } else {
-                val name = binding.playlistsName.text.toString().trim()
-                val desc =
-                    binding.playlistDescription.text.toString().trim().takeIf { it.isNotEmpty() }
                 if (name.isNotEmpty()) {
                     viewModel.createPlaylist(name, desc, requireContext())
+                    handleBackPressed()
                 }
             }
             restoreBottomNav()
-            findNavController().popBackStack()
         }
 
         binding.playlistsName.addTextChangedListener(object : TextWatcher {
@@ -166,7 +155,6 @@ open class PlaylistCreationFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 setCreateButtonColor(s)
             }
-
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -181,7 +169,7 @@ open class PlaylistCreationFragment : Fragment() {
                         } else {
                             Toast.makeText(
                                 requireContext(),
-                                "Что-то пошло не так при создании плейлиста",
+                                "Что-то пошло не так при ${if (isEditMode) "сохранении" else "создании"} плейлиста",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -213,11 +201,9 @@ open class PlaylistCreationFragment : Fragment() {
             ) == PackageManager.PERMISSION_GRANTED -> {
                 imagePickerLauncher.launch("image/*")
             }
-
             shouldShowRequestPermissionRationale(permission) -> {
                 permissionLauncher.launch(permission)
             }
-
             else -> {
                 permissionLauncher.launch(permission)
             }

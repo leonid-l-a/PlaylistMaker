@@ -74,6 +74,7 @@ open class PlaylistCreationViewModel(
             updatePlaylistUseCase.updatePlaylist(updatedPlaylist)
 
             _state.update { it.copy(playlist = updatedPlaylist) }
+            _playlistCreationState.value = Result.success(Unit)
         }
     }
 

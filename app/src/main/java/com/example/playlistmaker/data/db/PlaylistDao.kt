@@ -19,8 +19,14 @@ interface PlaylistDao {
     suspend fun insertPlaylistTrackCrossRef(crossRef: PlaylistTrackCrossRef)
 
     @Transaction
-    @Query("SELECT * FROM playlist_table WHERE playlistId = :playlistId")
-    suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks
+    suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks {
+        val playlist = getPlaylistById(playlistId)
+        val tracks = getTracksForPlaylistSorted(playlistId)
+        return PlaylistWithTracks(playlist = playlist, tracks = tracks)
+    }
+
+    @Query(" SELECT t.* FROM tracks_playlists_table AS t INNER JOIN playlist_track_cross_ref AS cr ON t.trackId = cr.trackId WHERE cr.playlistId = :playlistId ORDER BY cr.addedAt DESC ")
+    suspend fun getTracksForPlaylistSorted(playlistId: Long): List<TrackPlaylistsEntity>
 
     @Query("SELECT * FROM playlist_table")
     suspend fun getAllPlaylists(): List<PlaylistEntity>
@@ -83,7 +89,13 @@ interface PlaylistDao {
 
         if (existingRef == null) {
             insertTrack(track)
-            insertPlaylistTrackCrossRef(PlaylistTrackCrossRef(playlistId, track.trackId))
+            insertPlaylistTrackCrossRef(
+                PlaylistTrackCrossRef(
+                    playlistId = playlistId,
+                    trackId = track.trackId,
+                    addedAt = System.currentTimeMillis()
+                )
+            )
 
             val playlist = getPlaylistById(playlistId)
             updatePlaylist(playlist.copy(trackCount = playlist.trackCount + 1))

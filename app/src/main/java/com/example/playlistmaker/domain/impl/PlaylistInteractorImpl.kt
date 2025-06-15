@@ -66,5 +66,4 @@ class PlaylistInteractorImpl(
             .getTracksForPlaylist(playlistId)
             .map { it.toTrack() }
     }
-
 }

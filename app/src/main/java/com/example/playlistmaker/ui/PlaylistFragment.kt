@@ -31,6 +31,7 @@ class PlaylistFragment : Fragment(R.layout.fragment_playlist) {
 
     private var _binding: FragmentPlaylistBinding? = null
     private val binding get() = _binding!!
+    private var wasEmptySnackbarShown = false
     private lateinit var bottomSheetMenuBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private val trackAdapter: TrackAdapter by lazy {
@@ -52,6 +53,7 @@ class PlaylistFragment : Fragment(R.layout.fragment_playlist) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         setupUI()
         setupObservers()
@@ -89,6 +91,15 @@ class PlaylistFragment : Fragment(R.layout.fragment_playlist) {
                             .placeholder(R.drawable.ph_no_image)
                             .into(ivPlaylistImage)
                         trackAdapter.updateData(playlist.tracks)
+
+                        if (playlist.tracks.isEmpty() && !wasEmptySnackbarShown) {
+                            wasEmptySnackbarShown = true
+                            com.google.android.material.snackbar.Snackbar.make(
+                                root,
+                                getString(R.string.empty_playlist_snackbar),
+                                com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
 
                         Glide.with(root)
                             .load(playlist.imagePath)
@@ -148,8 +159,8 @@ class PlaylistFragment : Fragment(R.layout.fragment_playlist) {
         binding.btMore.setOnClickListener { viewModel.setMenuVisibility(true) }
         binding.tvDeletePlaylist.setOnClickListener { showDeletePlaylistDialog() }
         binding.overlay.setOnClickListener { viewModel.setMenuVisibility(false) }
-        binding.btShare.setOnClickListener { viewModel.share() }
-        binding.tvShare.setOnClickListener { viewModel.share() }
+        binding.btShare.setOnClickListener { share() }
+        binding.tvShare.setOnClickListener { share() }
         binding.tvEditPlaylist.setOnClickListener {
             val playlistEntity = viewModel.state.value.playlist!!.toEntity()
             val action = PlaylistFragmentDirections
@@ -244,4 +255,16 @@ class PlaylistFragment : Fragment(R.layout.fragment_playlist) {
             imagePath = this.imagePath,
             trackCount = this.trackCount
         )
+
+    private fun share() {
+        if (!viewModel.state.value.playlist?.tracks.isNullOrEmpty()) {
+            viewModel.share()
+        } else {
+            com.google.android.material.snackbar.Snackbar.make(
+                binding.root,
+                getString(R.string.empty_playlist_snackbar),
+                com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+            ).show()
+        }
+    }
 }
