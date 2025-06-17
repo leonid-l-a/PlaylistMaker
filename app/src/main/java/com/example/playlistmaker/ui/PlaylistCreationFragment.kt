@@ -144,7 +144,6 @@ open class PlaylistCreationFragment : Fragment() {
             } else {
                 if (name.isNotEmpty()) {
                     viewModel.createPlaylist(name, desc, requireContext())
-                    handleBackPressed()
                 }
             }
             restoreBottomNav()
