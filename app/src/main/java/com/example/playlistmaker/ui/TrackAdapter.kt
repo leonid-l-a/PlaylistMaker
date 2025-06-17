@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.databinding.ItemTrackBinding
+import com.example.playlistmaker.domain.entitie.Track
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 class TrackAdapter(
     private var tracks: List<Track>,
     private val onItemClickListener: (Track) -> Unit,
+    private val onItemLongClickListener: ((Track) -> Unit)? = null,
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     private var isClickEnabled = true
@@ -34,26 +35,43 @@ class TrackAdapter(
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
-
-        holder.itemView.setOnClickListener {
-            if (!isClickEnabled) return@setOnClickListener
-
-            isClickEnabled = false
-
-            onItemClickListener(tracks[position])
-
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(2000)
-                isClickEnabled = true
-            }
-        }
     }
 
     override fun getItemCount(): Int = tracks.size
 
-    class TrackViewHolder(private val binding: ItemTrackBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class TrackViewHolder(
+        private val binding: ItemTrackBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        private var currentTrack: Track? = null
+
+        init {
+            binding.root.setOnClickListener {
+                val track = currentTrack
+                if (!isClickEnabled || track == null) return@setOnClickListener
+
+                isClickEnabled = false
+                onItemClickListener(track)
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(2000)
+                    isClickEnabled = true
+                }
+            }
+
+            binding.root.setOnLongClickListener {
+                val track = currentTrack
+                if (track != null && onItemLongClickListener != null) {
+                    onItemLongClickListener.invoke(track)
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+
         fun bind(track: Track) {
+            currentTrack = track
             binding.tvTrackName.text = track.trackName
             binding.tvArtistName.text = track.artistName
             binding.tvTrackTime.text = track.trackTimeMillis

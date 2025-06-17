@@ -29,19 +29,19 @@ class SearchFragment : Fragment() {
 
     private val viewModel: SearchViewModel by viewModel()
     private val searchAdapter: TrackAdapter by lazy {
-        TrackAdapter(emptyList()) { track ->
+        TrackAdapter(emptyList(), onItemClickListener = { track ->
             openPlayer(
                 track
             )
-        }
+        })
     }
 
     private val historyAdapter: TrackAdapter by lazy {
-        TrackAdapter(emptyList()) { track ->
+        TrackAdapter(emptyList(), onItemClickListener = { track ->
             openPlayer(
                 track
             )
-        }
+        })
     }
 
     override fun onCreateView(

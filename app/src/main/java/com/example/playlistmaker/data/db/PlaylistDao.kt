@@ -19,22 +19,45 @@ interface PlaylistDao {
     suspend fun insertPlaylistTrackCrossRef(crossRef: PlaylistTrackCrossRef)
 
     @Transaction
-    @Query("SELECT * FROM playlist_table")
-    suspend fun getAllPlaylistsWithTracks(): List<PlaylistWithTracks>
+    suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks {
+        val playlist = getPlaylistById(playlistId)
+        val tracks = getTracksForPlaylistSorted(playlistId)
+        return PlaylistWithTracks(playlist = playlist, tracks = tracks)
+    }
 
-    @Transaction
-    @Query("SELECT * FROM playlist_table WHERE playlistId = :playlistId")
-    suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks
+    @Query(" SELECT t.* FROM tracks_playlists_table AS t INNER JOIN playlist_track_cross_ref AS cr ON t.trackId = cr.trackId WHERE cr.playlistId = :playlistId ORDER BY cr.addedAt DESC ")
+    suspend fun getTracksForPlaylistSorted(playlistId: Long): List<TrackPlaylistsEntity>
 
     @Query("SELECT * FROM playlist_table")
     suspend fun getAllPlaylists(): List<PlaylistEntity>
 
+    @Query("SELECT playlistId FROM playlist_track_cross_ref WHERE trackId = :trackId")
+    suspend fun getPlaylistIdsForTrack(trackId: Long): List<Long>
+
+    @Query("SELECT t.* FROM tracks_playlists_table AS t INNER JOIN playlist_track_cross_ref AS cr ON t.trackId = cr.trackId WHERE cr.playlistId = :playlistId")
+    suspend fun getTracksForPlaylist(playlistId: Long): List<TrackPlaylistsEntity>
+
+    private suspend fun deleteTrackIfOrphaned(trackId: Long) {
+        val playlistIds = getPlaylistIdsForTrack(trackId)
+        if (playlistIds.isEmpty()) {
+            deleteTrack(trackId)
+        }
+    }
+
+    @Transaction
+    suspend fun removeTrackFromPlaylistWithCleanup(playlistId: Long, trackId: Long) {
+        removeTrackFromPlaylist(playlistId, trackId)
+
+        val playlist = getPlaylistById(playlistId)
+        val newCount = playlist.trackCount - 1
+        updatePlaylist(playlist.copy(trackCount = newCount))
+
+        deleteTrackIfOrphaned(trackId)
+    }
+
     @Transaction
     @Query("SELECT trackId FROM playlist_track_cross_ref WHERE playlistId = :playlistId")
     suspend fun getTrackIdsForPlaylist(playlistId: Long): List<Long>
-
-    @Query("SELECT trackId FROM playlist_track_cross_ref WHERE trackId = :trackId")
-    suspend fun getAllRefsForTrack(trackId: Long): List<Long>
 
     @Query("DELETE FROM playlist_track_cross_ref WHERE playlistId = :playlistId AND trackId = :trackId")
     suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long)
@@ -51,18 +74,14 @@ interface PlaylistDao {
     @Transaction
     suspend fun deletePlaylistWithCleanup(playlistId: Long) {
         val trackIds = getTrackIdsForPlaylist(playlistId)
-
         deleteAllCrossRefsForPlaylist(playlistId)
 
         for (trackId in trackIds) {
-            val refs = getAllRefsForTrack(trackId)
-            if (refs.isEmpty()) {
-                deleteTrack(trackId)
-            }
+            deleteTrackIfOrphaned(trackId)
         }
-
         deletePlaylistById(playlistId)
     }
+
 
     @Transaction
     suspend fun insertTrackAndUpdateCount(track: TrackPlaylistsEntity, playlistId: Long): Boolean {
@@ -70,7 +89,13 @@ interface PlaylistDao {
 
         if (existingRef == null) {
             insertTrack(track)
-            insertPlaylistTrackCrossRef(PlaylistTrackCrossRef(playlistId, track.trackId))
+            insertPlaylistTrackCrossRef(
+                PlaylistTrackCrossRef(
+                    playlistId = playlistId,
+                    trackId = track.trackId,
+                    addedAt = System.currentTimeMillis()
+                )
+            )
 
             val playlist = getPlaylistById(playlistId)
             updatePlaylist(playlist.copy(trackCount = playlist.trackCount + 1))

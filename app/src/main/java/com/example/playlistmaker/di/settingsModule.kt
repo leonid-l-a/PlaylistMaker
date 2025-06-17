@@ -8,8 +8,12 @@ import com.example.playlistmaker.data.SystemThemeProviderImpl
 import com.example.playlistmaker.domain.repository.SettingsRepository
 import com.example.playlistmaker.domain.repository.SettingsIntentsRepository
 import com.example.playlistmaker.domain.SystemThemeProvider
+import com.example.playlistmaker.domain.use_case.inter.GetDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.inter.OpenUserAgreementUseCase
+import com.example.playlistmaker.domain.use_case.inter.SendSupportEmailUseCase
+import com.example.playlistmaker.domain.use_case.inter.SetDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.inter.ShareAppUseCase
 import com.example.playlistmaker.domain.use_case.settings.impl.*
-import com.example.playlistmaker.domain.use_case.settings.inter.*
 import com.example.playlistmaker.presentation.settings.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
