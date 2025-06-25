@@ -30,11 +30,11 @@ class FavoritesFragment : Fragment() {
     }
 
     private val favoritesAdapter: TrackAdapter by lazy {
-        TrackAdapter(emptyList()) { track ->
+        TrackAdapter(emptyList(), onItemClickListener = { track ->
             openPlayer(
                 track
             )
-        }
+        })
     }
 
     private fun openPlayer(track: Track) {
@@ -46,7 +46,7 @@ class FavoritesFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
         return binding.root
@@ -68,7 +68,7 @@ class FavoritesFragment : Fragment() {
         lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.favoritesState.collect { state ->
-                    when(state) {
+                    when (state) {
                         is FavoritesState.Empty -> {
                             binding.phEmpty.visibility = View.VISIBLE
                             binding.rvFavoritesList.visibility = View.GONE

@@ -37,5 +37,4 @@ class SettingsFragment: Fragment() {
         binding.userAgreementButton.setOnClickListener { viewModel.openUserAgreement() }
         binding.switchDarkMode.setOnClickListener { viewModel.toggleDarkMode() }
     }
-
 }

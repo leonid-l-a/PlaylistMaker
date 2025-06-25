@@ -1,7 +1,7 @@
 package com.example.playlistmaker.domain.use_case.settings.impl
 
 import com.example.playlistmaker.domain.repository.SettingsRepository
-import com.example.playlistmaker.domain.use_case.settings.inter.SetDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.inter.SetDarkModeUseCase
 
 class SetDarkModeUseCaseImpl(
     private val settingsRepository: SettingsRepository

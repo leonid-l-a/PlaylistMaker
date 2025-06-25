@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search">Поиск</string>
+    <string name="clear">очистить</string>
+    <string name="settings">Настройки</string>
+    <string name="library">Медиатека</string>
+    <string name="share">Поделиться</string>
+    <string name="dark_mode">Тёмная тема</string>
+    <string name="support">Поддержка</string>
+    <string name="user_agreement">Пользовательское соглашение</string>
+    <string name="share_app">Поделиться</string>
+    <string name="text_to_support">Написать в поддержку</string>
+    <string name="no_connection_text">Проблемы с подключением\\n\\nЗагрузка не удалась. Проверьте подключение к Интернету.</string>
+    <string name="retrySearch">Обновить</string>
+    <string name="nothing_found">Ничего не найдено</string>
+    <string name="search_history">Вы искали</string>
+    <string name="clear_history">Очистить историю</string>
+    <string name="track_durability">Длительность</string>
+    <string name="track_album_text">Альбом</string>
+    <string name="track_year_text">Год</string>
+    <string name="track_genre_text">Жанр</string>
+    <string name="track_country_text">Страна</string>
+    <string name="empty_library">Ваша медиатека пуста</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="no_playlists_created">Вы не создали\n ни одного плейлиста</string>
+    <string name="tab_favorites">Избранные треки</string>
+    <string name="tab_playlists">Плейлисты</string>
+    <string name="create">Создать</string>
+    <string name="description">Описание</string>
+    <string name="name">Название</string>
+    <string name="add_to_playlist_ru">Добавить в плейлист</string>
+    <string name="added_to_playlist">Добавлено в плейлист</string>
+    <string name="already_in_playlist">Трек уже добавлен в плейлист</string>
+    <string name="share_text">Изучайте Android-разработку с Яндекс Практикумом: https://practicum.yandex.ru/android-developer/</string>
+    <string name="support_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="support_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+
+    <plurals name="tracks_count">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
+
+    <plurals name="playlist_duration">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="many">%d минут</item>
+        <item quantity="other">%d минут</item>
+    </plurals>
+    <string name="edit">Редактировать информацию</string>
+    <string name="delete_playlist">Удалить плейлист</string>
+    <string name="delete_playlist_dialog_title">Удаление плейлиста</string>
+    <string name="delete_playlist_dialog_message">Вы уверены, что хотите удалить плейлист?</string>
+    <string name="remove_track_dialog_title">Удалить трек</string>
+    <string name="remove_track_dialog_message">Хотите удалить трек?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="edit_playlist">Edit playlist</string>
+    <string name="save">Save changes</string>
+    <string name="empty_playlist_snackbar">Вы не добавили ни одного трека в плейлист</string>
+</resources>

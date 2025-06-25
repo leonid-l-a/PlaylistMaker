@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.domain.use_case.settings.inter.GetDarkModeUseCase
+import com.example.playlistmaker.domain.use_case.inter.GetDarkModeUseCase
 
 class MainViewModel(
     private val getDarkModeUseCase: GetDarkModeUseCase,
