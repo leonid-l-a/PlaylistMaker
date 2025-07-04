@@ -22,7 +22,6 @@ import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.presentation.player.PlayerScreenState
 import com.example.playlistmaker.presentation.player.PlayerViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -52,37 +51,20 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupUi()
-        setupObservers()
-        hideBottomNavView()
         setupBottomSheet()
         setupClickListeners()
-
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    handleBackPressed()
-                }
-            }
-        )
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.pausePlayer()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.releasePlayer()
-        bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
+        observePlayerScreenState()
+        hideBottomNavView()
+        setupBackPressedHandler()
     }
 
     private fun setupUi() {
         binding.searchScreenToolbar.setNavigationOnClickListener { handleBackPressed() }
-        binding.ibPlay.setOnClickListener { viewModel.playbackControl() }
         binding.ibIsFavorite.setOnClickListener { viewModel.toggleFavorite() }
+        binding.rvPlaylists.adapter = playlistsAdapter
+        binding.rvPlaylists.layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun setupBottomSheet() {
@@ -91,26 +73,21 @@ class PlayerFragment : Fragment() {
             isHideable = true
             addBottomSheetCallback(bottomSheetCallback)
         }
-
-        binding.rvPlaylists.apply {
-            adapter = playlistsAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-        }
     }
 
     private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-            binding.overlay.visibility = when (newState) {
-                BottomSheetBehavior.STATE_HIDDEN -> View.GONE
-                else -> View.VISIBLE
-            }
+            binding.overlay.visibility = if (newState == BottomSheetBehavior.STATE_HIDDEN) View.GONE else View.VISIBLE
         }
 
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {
-        }
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
     }
 
     private fun setupClickListeners() {
+        binding.ibPlay.playbackControlCallback = {
+            viewModel.playbackControl()
+        }
+
         binding.ibAddToPlaylist.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
@@ -124,19 +101,20 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    private fun setupObservers() {
+    private fun observePlayerScreenState() {
         lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.playerScreenState.collect { state ->
+
                     state.trackData?.let { data ->
                         with(binding) {
                             tvTrackName.text = data.trackName
                             tvArtistName.text = data.artistName
                             trackDurability.text = data.duration
 
-                            trackAlbumNameText.visibility =
-                                if (data.collectionName.isNullOrEmpty()) View.GONE else View.VISIBLE
-                            trackAlbumName.visibility = trackAlbumNameText.visibility
+                            val albumVisibility = if (data.collectionName.isNullOrEmpty()) View.GONE else View.VISIBLE
+                            trackAlbumNameText.visibility = albumVisibility
+                            trackAlbumName.visibility = albumVisibility
                             trackAlbumName.text = data.collectionName
 
                             trackYear.text = data.year
@@ -158,37 +136,32 @@ class PlayerFragment : Fragment() {
                         } else {
                             getString(R.string.already_in_playlist) + result.playlistName
                         }
-
                         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                         viewModel.resetAddTrackResult()
-
                     }
 
                     state.playlists?.let { playlists ->
                         playlistsAdapter.submitList(playlists)
                     }
 
+                    binding.ibPlay.isPlaying = state.isPlaying
+
                     when (state.status) {
                         PlayerScreenState.Status.PREPARING -> {
                             binding.ibPlay.isEnabled = false
                             binding.timePlayed.text = "00:30"
                         }
-
                         PlayerScreenState.Status.READY -> {
                             binding.ibPlay.isEnabled = true
                         }
-
                         PlayerScreenState.Status.PLAYING -> {
                             binding.timePlayed.text = state.formattedTime
                         }
-
                         PlayerScreenState.Status.PAUSED -> {
                         }
-
                         PlayerScreenState.Status.COMPLETED -> {
                             binding.timePlayed.text = state.formattedTime
                         }
-
                         PlayerScreenState.Status.ERROR -> {
                             Toast.makeText(
                                 requireContext(),
@@ -199,14 +172,8 @@ class PlayerFragment : Fragment() {
                         }
                     }
 
-                    binding.ibPlay.setImageResource(
-                        if (state.isPlaying) R.drawable.ic_pause
-                        else R.drawable.ic_play
-                    )
-
                     binding.ibIsFavorite.setImageResource(
-                        if (state.isFavorite) R.drawable.ic_red_heart
-                        else R.drawable.ic_white_heart
+                        if (state.isFavorite) R.drawable.ic_red_heart else R.drawable.ic_white_heart
                     )
                 }
             }
@@ -214,20 +181,40 @@ class PlayerFragment : Fragment() {
     }
 
     private fun hideBottomNavView() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-            View.GONE
+        requireActivity().findViewById<View>(R.id.bottomNavigationView).visibility = View.GONE
         requireActivity().findViewById<View>(R.id.divider).visibility = View.GONE
+    }
+
+    private fun setupBackPressedHandler() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    handleBackPressed()
+                }
+            }
+        )
     }
 
     private fun handleBackPressed() {
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         } else {
-            requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-                View.VISIBLE
+            requireActivity().findViewById<View>(R.id.bottomNavigationView).visibility = View.VISIBLE
             requireActivity().findViewById<View>(R.id.divider).visibility = View.VISIBLE
             findNavController().popBackStack()
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.pausePlayer()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.releasePlayer()
+        bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
     }
 
     private fun Int.dpToPx(context: Context): Int =
