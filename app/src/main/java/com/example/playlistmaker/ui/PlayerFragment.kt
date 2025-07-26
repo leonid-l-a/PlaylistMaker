@@ -1,7 +1,11 @@
 package com.example.playlistmaker.ui
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +25,8 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.presentation.player.PlayerScreenState
 import com.example.playlistmaker.presentation.player.PlayerViewModel
+import com.example.playlistmaker.service.PlayerService
+import com.example.playlistmaker.service.PlayerServiceInterface
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -40,6 +46,22 @@ class PlayerFragment : Fragment() {
 
     private val viewModel: PlayerViewModel by viewModel(parameters = { parametersOf(args.trackData) })
 
+    private var playerService: PlayerServiceInterface? = null
+    private var isBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            val binder = service as PlayerService.PlayerServiceBinder
+            playerService = binder.getService()
+            isBound = true
+            viewModel.setService(playerService!!)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            isBound = false
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,6 +80,40 @@ class PlayerFragment : Fragment() {
         observePlayerScreenState()
         hideBottomNavView()
         setupBackPressedHandler()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Intent(requireContext(), PlayerService::class.java).also { intent ->
+            intent.putExtra("preview_url", args.trackData.previewUrl)
+            intent.putExtra("track_name", args.trackData.trackName)
+            intent.putExtra("artist_name", args.trackData.artistName)
+            requireActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isBound) {
+            playerService?.hideNotification()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (isBound && playerService?.isPlaying() == true) {
+            playerService?.showNotification()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (isBound) {
+            requireActivity().unbindService(serviceConnection)
+            isBound = false
+        }
+        viewModel.releasePlayer()
+        bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
     }
 
     private fun setupUi() {
@@ -149,7 +205,7 @@ class PlayerFragment : Fragment() {
                     when (state.status) {
                         PlayerScreenState.Status.PREPARING -> {
                             binding.ibPlay.isEnabled = false
-                            binding.timePlayed.text = "00:30"
+                            binding.timePlayed.text = "00:00"
                         }
                         PlayerScreenState.Status.READY -> {
                             binding.ibPlay.isEnabled = true
@@ -160,7 +216,7 @@ class PlayerFragment : Fragment() {
                         PlayerScreenState.Status.PAUSED -> {
                         }
                         PlayerScreenState.Status.COMPLETED -> {
-                            binding.timePlayed.text = state.formattedTime
+                            binding.timePlayed.text = "00:00"
                         }
                         PlayerScreenState.Status.ERROR -> {
                             Toast.makeText(
@@ -204,17 +260,6 @@ class PlayerFragment : Fragment() {
             requireActivity().findViewById<View>(R.id.divider).visibility = View.VISIBLE
             findNavController().popBackStack()
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.pausePlayer()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.releasePlayer()
-        bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
     }
 
     private fun Int.dpToPx(context: Context): Int =
