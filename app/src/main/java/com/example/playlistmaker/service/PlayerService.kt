@@ -9,6 +9,7 @@ import android.media.MediaPlayer
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.example.playlistmaker.R
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -145,6 +146,7 @@ class PlayerService : Service(), PlayerServiceInterface {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Playlist Maker")
             .setContentText("$currentArtistName - $currentTrackName")
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .build()
