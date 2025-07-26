@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.AttrRes
@@ -62,21 +63,29 @@ class PlaybackButtonView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_UP) {
-            val x = event.x
-            val y = event.y
-            if (x in 0f..width.toFloat() && y in 0f..height.toFloat()) {
-                playbackControlCallback?.invoke()
-                performClick()
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                return true
+            }
+            MotionEvent.ACTION_UP -> {
+                Log.d("PlaybackButtonView", "onTouchEvent: ACTION_UP")
+                val x = event.x
+                val y = event.y
+                if (x in 0f..width.toFloat() && y in 0f..height.toFloat()) {
+                    playbackControlCallback?.invoke()
+                    performClick()
+                    return true
+                }
             }
         }
-        return true
+        return false
     }
 
     override fun performClick(): Boolean {
         super.performClick()
         return true
     }
+
 
 }
 

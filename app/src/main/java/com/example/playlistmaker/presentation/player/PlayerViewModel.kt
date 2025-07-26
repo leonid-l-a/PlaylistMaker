@@ -8,24 +8,24 @@ import com.example.playlistmaker.domain.entitie.toTrackPlaylistsEntity
 import com.example.playlistmaker.domain.interactor.FavoriteInteractor
 import com.example.playlistmaker.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.domain.interactor.PlaylistInteractor
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.isActive
+import com.example.playlistmaker.service.PlayerServiceInterface
+import com.example.playlistmaker.service.PlayerServiceState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
-import java.util.concurrent.TimeUnit
+import java.util.Locale
 
 class PlayerViewModel(
-    private val playerInteractor: PlayerInteractor,
     private val favoriteInteractor: FavoriteInteractor,
     private val track: Track,
     private val playlistInteractor: PlaylistInteractor,
+    private val playerInteractor: PlayerInteractor
 ) : ViewModel() {
 
     companion object {
         private const val MAX_TRACK_DURATION = 30_000L
-        private const val UPDATE_INTERVAL = 300L
     }
 
     private val _playerState = MutableStateFlow(
@@ -37,28 +37,63 @@ class PlayerViewModel(
             isPlaying = false,
             isFavorite = track.isFavorite,
             trackData = null,
-            errorMessage = null
+            errorMessage = null,
+            playlists = null,
+            addTrackResult = null
         )
     )
-    val playerScreenState: StateFlow<PlayerScreenState> = _playerState.asStateFlow()
+    val playerScreenState: StateFlow<PlayerScreenState> = _playerState
 
-    private var updateJob: Job? = null
+    private var playerService: PlayerServiceInterface? = null
 
     init {
         loadTrackData()
-
-        preparePlayer()
-
         observeFavorites()
-
         setPlaylists()
     }
 
+    fun setService(service: PlayerServiceInterface) {
+        playerService = service
+        observeServiceState()
+    }
+
+    private fun observeServiceState() {
+        viewModelScope.launch {
+            playerService?.getPlayerStateFlow()?.collect { state ->
+                _playerState.update { old ->
+                    val status = when (state.status) {
+                        PlayerServiceState.Status.PREPARING -> PlayerScreenState.Status.PREPARING
+                        PlayerServiceState.Status.PLAYING -> PlayerScreenState.Status.PLAYING
+                        PlayerServiceState.Status.PAUSED -> PlayerScreenState.Status.PAUSED
+                        PlayerServiceState.Status.COMPLETED -> PlayerScreenState.Status.COMPLETED
+                    }
+                    val formatted = when (state.status) {
+                        PlayerServiceState.Status.PREPARING,
+                        PlayerServiceState.Status.COMPLETED,
+                            -> "00:00"
+
+                        else -> {
+                            val elapsedSec = state.elapsedMillis / 1000
+                            val minutes = elapsedSec / 60
+                            val seconds = elapsedSec % 60
+                            String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+                        }
+                    }
+                    old.copy(
+                        status = status,
+                        elapsedMillis = state.elapsedMillis,
+                        remainingMillis = state.remainingMillis,
+                        formattedTime = formatted,
+                        isPlaying = (state.status == PlayerServiceState.Status.PLAYING)
+                    )
+                }
+            }
+        }
+    }
+
     fun playbackControl() {
-        if (playerInteractor.isPlaying()) {
-            pausePlayer()
-        } else {
-            startPlayer()
+        playerService?.let {
+            if (it.isPlaying()) it.pause() else it.play()
         }
     }
 
@@ -72,13 +107,7 @@ class PlayerViewModel(
         }
     }
 
-    override fun onCleared() {
-        releasePlayer()
-        super.onCleared()
-    }
-
     private fun loadTrackData() {
-
         val data = TrackData(
             trackName = track.trackName,
             artistName = track.artistName,
@@ -90,125 +119,23 @@ class PlayerViewModel(
             country = track.country,
             isFavorite = track.isFavorite
         )
-
-        _playerState.update { old ->
-            old.copy(trackData = data)
-        }
-    }
-
-    private fun preparePlayer() {
-        _playerState.update { old ->
-            old.copy(
-                status = PlayerScreenState.Status.PREPARING,
-                formattedTime = "00:30",
-                errorMessage = null
-            )
-        }
-
-        playerInteractor.prepare(
-            track.previewUrl,
-            onPrepared = {
-                _playerState.update { old ->
-                    old.copy(
-                        status = PlayerScreenState.Status.READY,
-                        formattedTime = "00:30",
-                        errorMessage = null
-                    )
-                }
-            },
-            onCompletion = {
-                _playerState.update { old ->
-                    old.copy(
-                        status = PlayerScreenState.Status.COMPLETED,
-                        isPlaying = false,
-                        elapsedMillis = MAX_TRACK_DURATION,
-                        remainingMillis = 0L,
-                        formattedTime = "00:30",
-                        errorMessage = null
-                    )
-                }
-                updateJob?.cancel()
-            }
-        )
-    }
-
-    private fun startPlayer() {
-        playerInteractor.play()
-        _playerState.update { old ->
-            old.copy(
-                status = PlayerScreenState.Status.PLAYING,
-                isPlaying = true,
-                errorMessage = null
-            )
-        }
-
-        updateJob?.cancel()
-        updateJob = viewModelScope.launch {
-            while (isActive) {
-                val elapsed = playerInteractor.getCurrentTime().toLong()
-                val remaining = (MAX_TRACK_DURATION - elapsed).coerceAtLeast(0L)
-
-                val minutes = TimeUnit.MILLISECONDS.toMinutes(remaining) % 60
-                val seconds = TimeUnit.MILLISECONDS.toSeconds(remaining) % 60
-                val formatted = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
-
-                _playerState.update { old ->
-                    old.copy(
-                        status = PlayerScreenState.Status.PLAYING,
-                        elapsedMillis = elapsed,
-                        remainingMillis = remaining,
-                        formattedTime = formatted,
-                        isPlaying = true,
-                        errorMessage = null,
-                    )
-                }
-                delay(UPDATE_INTERVAL)
-            }
-        }
-    }
-
-    fun pausePlayer() {
-        playerInteractor.pause()
-        _playerState.update { old ->
-            old.copy(
-                status = PlayerScreenState.Status.PAUSED,
-                isPlaying = false,
-                errorMessage = null
-            )
-        }
-        updateJob?.cancel()
-    }
-
-    fun releasePlayer() {
-        playerInteractor.release()
-        updateJob?.cancel()
+        _playerState.update { it.copy(trackData = data) }
     }
 
     private fun observeFavorites() {
         viewModelScope.launch {
             favoriteInteractor.getFavorites().collectLatest { favList ->
                 val isFav = favList.any { it.trackId == track.trackId }
-                _playerState.update { old ->
-                    old.copy(isFavorite = isFav)
-                }
+                _playerState.update { old -> old.copy(isFavorite = isFav) }
             }
         }
     }
 
     fun setPlaylists() {
         viewModelScope.launch {
-            val playlists = getPlaylists()
-            _playerState.update { old ->
-                old.copy(
-                    playlists = playlists
-                )
-            }
-
+            val playlists = playlistInteractor.getAllPlaylists()
+            _playerState.update { it.copy(playlists = playlists) }
         }
-    }
-
-    suspend fun getPlaylists(): List<PlaylistEntity> {
-        return playlistInteractor.getAllPlaylists()
     }
 
     fun addTrackToPlaylist(playlist: PlaylistEntity) {
@@ -217,9 +144,8 @@ class PlayerViewModel(
                 track.toTrackPlaylistsEntity(),
                 playlist.playlistId!!
             )
-
             if (result) {
-                val updatedPlaylists = getPlaylists()
+                val updatedPlaylists = playlistInteractor.getAllPlaylists()
                 _playerState.update { old ->
                     old.copy(
                         addTrackResult = PlayerScreenState.AddTrackResult(
@@ -244,5 +170,9 @@ class PlayerViewModel(
 
     fun resetAddTrackResult() {
         _playerState.update { it.copy(addTrackResult = null) }
+    }
+
+    fun releasePlayer() {
+        playerInteractor.release()
     }
 }

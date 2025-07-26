@@ -1,24 +1,24 @@
 [versions]
 agp = "8.9.3"
-compiler = "4.15.1"
+compiler = "4.16.0"
 converterGson = "2.11.0"
-gson = "2.11.0"
-koinAndroid = "3.3.0"
-kotlin = "2.0.21"
+gson = "2.12.1"
+koinAndroid = "4.0.2"
+kotlin = "2.1.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-appcompat = "1.7.0"
-kotlinxCoroutinesAndroidVersion = "1.7.3"
-lifecycleViewmodelKtx = "2.9.0"
+appcompat = "1.7.1"
+kotlinxCoroutinesAndroidVersion = "1.10.1"
+lifecycleViewmodelKtx = "2.9.2"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 materialVersion = "1.12.0"
-navigationFragmentKtx = "2.9.0"
+navigationFragmentKtx = "2.9.2"
 peko = "3.0.5"
 retrofit = "2.11.0"
-roomVersion = "2.7.1"
+roomVersion = "2.7.2"
 viewpager2 = "1.1.0"
 
 
@@ -51,5 +51,5 @@ retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", v
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version = "2.9.0" }
+androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version = "2.9.2" }
 
