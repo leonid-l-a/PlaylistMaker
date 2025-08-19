@@ -4,12 +4,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Spacer as ComposeSpacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +23,7 @@ import coil3.compose.AsyncImage
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.ui.theme.Dimens
+import androidx.compose.foundation.layout.Spacer as ComposeSpacer
 
 @Composable
 fun TrackItem(track: Track, onClick: (Track) -> Unit) {
@@ -42,7 +42,7 @@ fun TrackItem(track: Track, onClick: (Track) -> Unit) {
             error = painterResource(R.drawable.ph_no_image),
             modifier = Modifier
                 .size(45.dp)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(2.dp))
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column(
@@ -62,7 +62,8 @@ fun TrackItem(track: Track, onClick: (Track) -> Unit) {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
                 Icon(
                     painter = painterResource(R.drawable.ic_dot),
@@ -84,3 +85,4 @@ fun TrackItem(track: Track, onClick: (Track) -> Unit) {
         )
     }
 }
+

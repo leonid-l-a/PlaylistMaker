@@ -3,16 +3,15 @@ package com.example.playlistmaker.ui.library
 import android.os.Bundle
 import android.view.View
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.presentation.library.FavoritesState
-import com.example.playlistmaker.presentation.library.PlaylistsState
 import com.example.playlistmaker.presentation.library.FavoritesViewModel
+import com.example.playlistmaker.presentation.library.PlaylistsState
 import com.example.playlistmaker.presentation.library.PlaylistsViewModel
 import com.example.playlistmaker.ui.theme.AppTheme
-import androidx.compose.runtime.getValue
-
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LibraryFragment : Fragment() {
@@ -22,7 +21,7 @@ class LibraryFragment : Fragment() {
 
     override fun onCreateView(
         inflater: android.view.LayoutInflater, container: android.view.ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
@@ -30,7 +29,8 @@ class LibraryFragment : Fragment() {
                     val favoritesState by favoritesViewModel.favoritesState.collectAsState()
                     val playlistsState by playlistsViewModel.state.collectAsState()
                     val tracks = (favoritesState as? FavoritesState.Favorites)?.tracks.orEmpty()
-                    val playlists = (playlistsState as? PlaylistsState.Playlists)?.playlists.orEmpty()
+                    val playlists =
+                        (playlistsState as? PlaylistsState.Playlists)?.playlists.orEmpty()
                     LibraryScreen(
                         favorites = tracks,
                         playlists = playlists,
@@ -53,5 +53,20 @@ class LibraryFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        findNavController().currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<Boolean>("refresh_playlists")
+            ?.observe(viewLifecycleOwner) { needRefresh ->
+                if (needRefresh == true) {
+                    playlistsViewModel.loadPlaylists()
+                    findNavController().currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("refresh_playlists", false)
+                }
+            }
     }
 }

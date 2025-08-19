@@ -13,7 +13,8 @@ private val LightColors = lightColorScheme(
     background = CommonScreenBackgroundTintLight,
     onBackground = CommonTextColorLight,
     surface = CommonScreenBackgroundTintLight,
-    onSurface = SwitchThumbInactiveColor
+    onSurface = SwitchThumbInactiveColor,
+    primaryContainer = SearchTextFieldBackgroundColor
 )
 
 private val DarkColors = darkColorScheme(
@@ -23,7 +24,8 @@ private val DarkColors = darkColorScheme(
     background = CommonScreenBackgroundTintDark,
     onBackground = CommonTextColorDark,
     surface = CommonScreenBackgroundTintDark,
-    onSurface = SwitchThumbInactiveColor
+    onSurface = SwitchThumbInactiveColor,
+    primaryContainer = SearchTextFieldBackgroundColor
 )
 
 @Composable

@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,8 +29,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.core.net.toUri
 
+@Suppress("DEPRECATION")
 open class PlaylistCreationFragment : Fragment() {
 
     private var _binding: FragmentPlaylistCreationBinding? = null
@@ -140,7 +141,11 @@ open class PlaylistCreationFragment : Fragment() {
                 binding.playlistDescription.text.toString().trim().takeIf { it.isNotEmpty() }
 
             if (isEditMode) {
-                viewModel.updatePlaylist(name = name, description = desc, context = requireContext())
+                viewModel.updatePlaylist(
+                    name = name,
+                    description = desc,
+                    context = requireContext()
+                )
             } else {
                 if (name.isNotEmpty()) {
                     viewModel.createPlaylist(name, desc, requireContext())
@@ -154,6 +159,7 @@ open class PlaylistCreationFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 setCreateButtonColor(s)
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -164,6 +170,10 @@ open class PlaylistCreationFragment : Fragment() {
                 viewModel.playlistCreationState.collect { result ->
                     result?.let {
                         if (it.isSuccess) {
+                            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                                "refresh_playlists",
+                                true
+                            )
                             findNavController().popBackStack()
                         } else {
                             Toast.makeText(
@@ -200,9 +210,11 @@ open class PlaylistCreationFragment : Fragment() {
             ) == PackageManager.PERMISSION_GRANTED -> {
                 imagePickerLauncher.launch("image/*")
             }
+
             shouldShowRequestPermissionRationale(permission) -> {
                 permissionLauncher.launch(permission)
             }
+
             else -> {
                 permissionLauncher.launch(permission)
             }

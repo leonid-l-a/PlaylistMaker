@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.playlistmaker.R
 
@@ -27,7 +26,7 @@ fun AppTopBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .padding(10.dp),
+            .padding(start = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isIconNeeded) {
@@ -47,10 +46,4 @@ fun AppTopBar(
             color = MaterialTheme.colorScheme.onBackground,
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Hdd() {
-    AppTopBar(true, "Настройки") {}
 }

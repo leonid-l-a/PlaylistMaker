@@ -19,37 +19,31 @@ val AppTypography = Typography(
         fontSize = Dimens.HeaderSize,
         lineHeight = Dimens.CommonLineHeight.value.sp
     ),
-    // Обычный текст
     bodyLarge = TextStyle(
         fontFamily = YsDisplayRegular,
         fontWeight = FontWeight.Normal,
         fontSize = Dimens.TextCommonSize
     ),
-    // Мелкий текст (артист и время)
     bodySmall = TextStyle(
         fontFamily = YsDisplayRegular,
         fontWeight = FontWeight.Normal,
         fontSize = Dimens.TrackArtistNameAndTimeSize
     ),
-    // Текст поиска
     titleMedium = TextStyle(
         fontFamily = YsDisplayMedium,
         fontWeight = FontWeight.Normal,
         fontSize = Dimens.SearchScreenTextSize
     ),
-    // Характеристики в плеере
     labelMedium = TextStyle(
         fontFamily = YsDisplayRegular,
         fontWeight = FontWeight.Normal,
         fontSize = Dimens.PlayerCharacteristicsSize
     ),
-    // Элемент плейлиста
     labelSmall = TextStyle(
         fontFamily = YsDisplayRegular,
         fontWeight = FontWeight.Normal,
         fontSize = Dimens.PlaylistItemTextSize
     ),
-    // Описание плейлиста
     titleSmall = TextStyle(
         fontFamily = YsDisplayRegular,
         fontWeight = FontWeight.Normal,

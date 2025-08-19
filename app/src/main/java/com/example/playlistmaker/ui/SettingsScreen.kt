@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -47,7 +46,8 @@ fun SettingsScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onToggleDarkMode() }
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp)
+                .height(61.dp)
         ) {
             Text(
                 text = stringResource(R.string.dark_mode),
@@ -66,13 +66,13 @@ fun SettingsScreen(
                 )
             )
         }
-        HorizontalDivider()
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onShareApp() }
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 16.dp)
+                .height(61.dp)
         ) {
             Text(
                 text = stringResource(R.string.share),
@@ -88,13 +88,13 @@ fun SettingsScreen(
                 tint = MaterialTheme.colorScheme.secondary
             )
         }
-        HorizontalDivider()
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onSupport() }
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 16.dp)
+                .height(61.dp)
         ) {
 
             Text(
@@ -110,13 +110,13 @@ fun SettingsScreen(
                 tint = MaterialTheme.colorScheme.secondary
             )
         }
-        HorizontalDivider()
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onUserAgreement() }
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 16.dp)
+                .height(61.dp)
         ) {
             Text(
                 text = stringResource(R.string.user_agreement),

@@ -5,23 +5,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,24 +33,29 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.entitie.Track
 import com.example.playlistmaker.presentation.search.SearchState
 import com.example.playlistmaker.presentation.search.SearchViewModel
 import com.example.playlistmaker.ui.util.AppTopBar
+import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel,
+    viewModel: SearchViewModel = koinViewModel(),
     onTrackClick: (Track) -> Unit,
 ) {
     val searchState by viewModel.searchState.collectAsState()
     var query by rememberSaveable { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
         modifier = Modifier
@@ -59,48 +67,87 @@ fun SearchScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(
-            value = query,
-            onValueChange = { text ->
-                query = text
-                viewModel.onQueryChanged(text)
-            },
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
-                .padding(0.dp),
-            singleLine = true,
-            maxLines = 1,
-            placeholder = { Text(stringResource(R.string.search)) },
-            textStyle = MaterialTheme.typography.bodyLarge,
-            leadingIcon = {
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_search),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary
+                    contentDescription = "Search Icon",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
-            },
-            trailingIcon = {
-                if (query.isNotEmpty()) {
-                    IconButton(onClick = {
-                        query = ""
-                        viewModel.loadHistory()
-                    }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_button_clear),
-                            contentDescription = stringResource(R.string.clear),
-                            tint = MaterialTheme.colorScheme.primary
+
+                Spacer(Modifier.width(8.dp))
+
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    BasicTextField(
+                        value = query,
+                        onValueChange = { newText ->
+                            query = newText
+                            viewModel.onQueryChanged(newText)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { focusState ->
+                                if (focusState.isFocused) {
+                                    viewModel.loadHistory()
+                                }
+                            },
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 16.sp
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = {
+                            viewModel.onQueryChanged(query)
+                            keyboardController?.hide()
+                        }),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary)
+                    )
+
+                    if (query.isEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.search),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         )
                     }
                 }
-            },
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-            ),
-            shape = RoundedCornerShape(8.dp)
-        )
+
+                if (query.isNotEmpty()) {
+                    Spacer(Modifier.width(8.dp))
+                    IconButton(
+                        onClick = {
+                            query = ""
+                            viewModel.loadHistory()
+                        },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_button_clear),
+                            contentDescription = "Clear Search",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -191,9 +238,7 @@ fun SearchScreen(
                 }
             }
 
-            is SearchState.Empty -> {
-            }
+            is SearchState.Empty -> {}
         }
     }
 }
-
