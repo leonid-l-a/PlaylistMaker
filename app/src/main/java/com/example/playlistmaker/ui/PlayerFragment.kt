@@ -80,6 +80,7 @@ class PlayerFragment : Fragment() {
         observePlayerScreenState()
         hideBottomNavView()
         setupBackPressedHandler()
+
     }
 
     override fun onStart() {
