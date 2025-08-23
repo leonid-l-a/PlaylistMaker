@@ -45,7 +45,6 @@ open class PlaylistCreationViewModel(
                 )
 
                 createPlaylistUseCase(data)
-
                 _playlistCreationState.value = Result.success(Unit)
             } catch (e: Exception) {
                 _playlistCreationState.value = Result.failure(e)
